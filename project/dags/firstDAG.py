@@ -4,9 +4,9 @@ import pandas as pd
 from sqlalchemy import create_engine
 from datetime import timedelta, datetime
 
-from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
-from airflow.operators.bash_operator import BashOperator
+#from airflow import DAG
+#from airflow.operators.python_operator import PythonOperator
+#from airflow.operators.bash_operator import BashOperator
 
 from utils.TechFields import add_technical_col
 from utils.db_loader import load_to_db
@@ -24,13 +24,13 @@ def readData(name:str):
     return data
 
 def writeToDB(name:str):
-    con_s = "mysql+pymysql://oliver:123456@OKRAMER-MAC/src?charset=utf8mb4" #'postgresql://postgres:123456@OKRAMER-MAC:5432/BANK'
-    con = create_engine(con_s, echo=False)
+    con_s = "mysql+pymysql://janna:123456@10.6.0.1:3307/src?charset=utf8mb4" #'postgresql://postgres:123456@OKRAMER-MAC:5432/BANK'
+    con = create_engine(con_s, echo=False, pool_recycle=3600)
     data = readData(name)
     data = add_technical_col(data=data,t_name=name,date=None)
     #data.drop_duplicates(inplace=True)
-    #load_to_db(data=data, db_con=con, t_name=kwargs['name'], date='2018-12-31')
-    data.to_sql(name=name,con=con,if_exists='append',index=False)
+    load_to_db(data=data, db_con=con, t_name=name, date='2018-12-31', schema='src')
+    #data.to_sql(name=name,con=con,if_exists='append',index=False)
 
 
 

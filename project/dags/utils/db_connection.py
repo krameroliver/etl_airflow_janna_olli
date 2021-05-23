@@ -15,7 +15,7 @@ def connect_to_db(layer:str=None):
     db_type = documents['database']['type']
 
     if db_type is 'mariadb':
-        con_profile = "mysql+pymysql://"+user+":"+psw+"@"+host+"/"+layer+"?charset=utf8mb4"
+        con_profile = "mysql+pymysql://"+user+":"+str(psw)+"@"+host+":"+str(port)+"/"+layer+"?charset=utf8mb4"
     elif db_type is 'postgres':
         con_profile = db_type + '://' + user + ':' + str(psw) + '@' + host + ':' + str(port) + '/' + dbname
     else:

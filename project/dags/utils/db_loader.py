@@ -4,7 +4,7 @@ import sqlalchemy as db
 from sqlalchemy import MetaData
 from sqlalchemy import delete
 from sqlalchemy.dialects.mysql import insert
-#from termcolor2 import colored
+from termcolor2 import colored
 import numpy as np
 
 
@@ -13,28 +13,28 @@ def load_to_db(data: pd.DataFrame, db_con, t_name, date, schema:str=None):
     results_u = None
     results_d = None
     target_table = None
-    target_table_hist = None
+    #target_table_hist = None
 
     metadata = MetaData(bind=db_con)
-    metadata.reflect(bind=db_con, schema=schema)
+    #metadata.reflect(bind=db_con, schema=schema)
     print(metadata.sorted_tables)
     for table in [i for i in reversed(metadata.sorted_tables) if "_hist" not in i.name and i.name == t_name]:
         target_table = table
-    for table in [i for i in reversed(metadata.sorted_tables) if i.name == t_name + '_hist']:
-        target_table_hist = table
+    #for table in [i for i in reversed(metadata.sorted_tables) if i.name == t_name + '_hist']:
+    #    target_table_hist = table
 
     table_hk = list(
-        pd.read_sql(sql='select {col}_hk from {table};'.format(col=t_name, table=t_name, schema=schema),
+        pd.read_sql(sql='select {col}_hk from {schema}.{table};'.format(col=t_name, table=t_name, schema=schema),
                     con=db_con)[
             t_name + '_hk'])
     df_hk = list(data[t_name + '_hk'])
 
     insert_hk = [i for i in df_hk if i not in table_hk]
-    #print(colored('INFO: insert: ' + str(len(insert_hk)), 'green'))
+    print(colored('INFO: insert: ' + str(len(insert_hk)), 'green'))
     delete_hk = [i for i in table_hk if i not in df_hk]
-    #print(colored('INFO: delete:' + str(len(delete_hk)), 'green'))
+    print(colored('INFO: delete:' + str(len(delete_hk)), 'green'))
     update_hk = [i for i in table_hk if i in df_hk]
-    #print(colored('INFO: update:' + str(len(update_hk)), 'green'))
+    print(colored('INFO: update:' + str(len(update_hk)), 'green'))
     # values_list_i = data[data[t_name + '_hk'].isin(insert_hk)].to_dict('records')
     # print(data[data[t_name+'_hk'] in insert_hk])
 
@@ -64,20 +64,20 @@ def load_to_db(data: pd.DataFrame, db_con, t_name, date, schema:str=None):
             # autocommit
             print('commit')
             db_con.execute('commit;')
-    #else:
-     #   print(colored('INFO: Keine Insert-Saetze vorhanden', color='yellow'))
+    else:
+        print(colored('INFO: Keine Insert-Saetze vorhanden', color='yellow'))
 
     # delete
     if len(delete_hk) > 0:
         delete_stmnt = delete(target_table).where(t_name + 'hk' in delete_hk)
         results_d = db_con.execute(delete_stmnt)
-    #else:
-    #    print(colored('INFO: Keine Delete-Saetze vorhanden', color='yellow'))
+    else:
+        print(colored('INFO: Keine Delete-Saetze vorhanden', color='yellow'))
 
     # update
     if len(update_hk) > 0:
         table_diff_hk = pd.read_sql(
-            sql='select {col}_hk, diff_hk from {table};'.format(col=t_name, table=t_name, schema=schema),
+            sql='select {col}_hk, diff_hk from {schema}.{table};'.format(col=t_name, table=t_name, schema=schema),
             con=db_con)
         df_diff_hk = data[[t_name + '_hk', 'diff_hk']]
 
@@ -97,12 +97,13 @@ def load_to_db(data: pd.DataFrame, db_con, t_name, date, schema:str=None):
                     getattr(target_table.c, t_name + '_hk') == i)
                 db_con.execute(update_stmnt)
 
-                update_stmnt_hist = db.update(target_table_hist).values({'processing_date_end': date}).where(
-                    getattr(target_table_hist.c, t_name + '_hk') == i)
-                results_u = db_con.execute(update_stmnt_hist)
-     #   else:
-      #      print(colored('INFO: Keine Update-Saetze vorhanden', color='yellow'))
-    #else:
-    #    print(colored('INFO: Keine potentiellen Update-Saetze vorhanden', color='yellow'))
+                #update_stmnt_hist = db.update(target_table_hist).values({'processing_date_end': date}).where(
+                 #   getattr(target_table_hist.c, t_name + '_hk') == i)
+                #results_u = db_con.execute(update_stmnt_hist)
+        else:
+            print(colored('INFO: Keine Update-Saetze vorhanden', color='yellow'))
+    else:
+        print(colored('INFO: Keine potentiellen Update-Saetze vorhanden', color='yellow'))
 
     return results_i, results_d, results_u
+

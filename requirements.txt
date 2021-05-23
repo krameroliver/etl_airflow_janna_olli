@@ -7,3 +7,4 @@ pymongo
 pandasql
 termcolor2
 pymysql
+apache-airflow
