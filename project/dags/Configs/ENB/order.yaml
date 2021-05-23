@@ -1,0 +1,11 @@
+order:
+  fields:
+    - 'order_id'
+    - 'account_id'
+    - 'bank_to'
+    - 'account_to'
+    - 'amount'
+    - 'k_symbol'
+  businesskeys:
+    - 'order_id'
+  layer: 'src'

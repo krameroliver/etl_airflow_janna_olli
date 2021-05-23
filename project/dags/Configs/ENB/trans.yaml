@@ -1,0 +1,21 @@
+trans:
+  fields:
+    - 'run_id'
+    - 'trans_id'
+    - 'account_id'
+    - 'trans_type'
+    - 'operation'
+    - 'amount'
+    - 'balance'
+    - 'k_symbol'
+    - 'bank'
+    - 'account'
+    - 'year'
+    - 'month'
+    - 'day'
+    - 'fulldate'
+    - 'fulltime'
+    - 'fulldatewithtime'
+  businesskeys:
+    - 'trans_id'
+  layer: 'src'

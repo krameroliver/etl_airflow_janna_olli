@@ -1,0 +1,17 @@
+loan:
+  fields:
+    - 'loan_id'
+    - 'account_id'
+    - 'amount'
+    - 'duration'
+    - 'payments'
+    - 'status'
+    - 'year'
+    - 'month'
+    - 'day'
+    - 'fulldate'
+    - 'location'
+    - 'purpose'
+  businesskeys:
+    - 'loan_id'
+  layer: 'src'

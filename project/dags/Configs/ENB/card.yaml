@@ -1,0 +1,13 @@
+card:
+  fields:
+    - 'card_id'
+    - 'disp_id'
+    - 'card_type'
+    - 'year'
+    - 'month'
+    - 'day'
+    - 'fulldate'
+  businesskeys:
+    - 'card_id'
+  layer: 'src'
+

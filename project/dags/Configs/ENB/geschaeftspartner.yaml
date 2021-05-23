@@ -1,0 +1,15 @@
+geschaeftspartner:
+  fields:
+    - 'kundennummer'
+    - 'anrede'
+    - 'vorname'
+    - 'nachname'
+    - 'geburtsdatum'
+    - 'sterbedatum'
+    - 'geschlecht'
+    - 'sozialversicherungsnummer'
+    - 'kreditkartenanzahl'
+    - 'loeschung'
+  businesskeys:
+    - 'kundennummer'
+  layer: 'biz'

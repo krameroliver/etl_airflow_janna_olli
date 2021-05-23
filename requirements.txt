@@ -1,0 +1,9 @@
+ConfigParser
+psycopg2-binary
+pandas
+sqlalchemy
+requests
+pymongo
+pandasql
+termcolor2
+pymysql

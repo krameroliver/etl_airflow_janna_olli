@@ -1,0 +1,7 @@
+Orchester:
+  src:
+    name: 'test'
+    id: '71881d5aabbc94b4f9659a74286fd0c7e55ba48604a6b0089b4e055a63dafcf1'
+    image: 'source_python:v1'
+    trigger_name: 'ENB_SOURCE'
+    trigger_id:  1
