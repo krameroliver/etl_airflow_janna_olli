@@ -3,6 +3,9 @@ import os,sys
 import pandas as pd
 from sqlalchemy import create_engine
 from datetime import timedelta, datetime
+
+import pymysql
+from sshtunnel import SSHTunnelForwarder
 import time
 import numpy as np
 
@@ -36,13 +39,19 @@ def filterData(data:pd.DataFrame):
 
 
 def writeToDB(name:str,dele:str=None):
-    con_s = "mysql+pymysql://oliver:123456@192.168.0.132:3307/src?charset=utf8mb4" #'postgresql://postgres:123456@OKRAMER-MAC:5432/BANK'
-    con = create_engine(con_s, echo=False, pool_recycle=3600)
+    tunnel = SSHTunnelForwarder(('82.165.203.114', 22), ssh_password="Z4ykW#&q*5", ssh_username="root",
+                                remote_bind_address=("127.0.0.1", 3306))
+    tunnel.start()
+
+    con = pymysql.connect(host='127.0.0.1', user="dbuser", passwd="123456", port=tunnel.local_bind_port)
+
+    #con_s = "mysql+pymysql://dbuser:123456@82.165.203.114:22/src?charset=utf8mb4" #'postgresql://postgres:123456@OKRAMER-MAC:5432/BANK'
+    #con = create_engine(con_s, echo=False, pool_recycle=3600)
     data = readData(name,dele)
     print("ReadFinished")
     print("write to temp table")
-    load(data=data, db_con=con, t_name=name, date='2018-12-31', schema='src',commit_size=1000)
-    #data.to_sql(name=name+'{t}'.format(t=time.time()),con=con,schema='src')
+    #load(data=data, db_con=con, t_name=name, date='2018-12-31', schema='src',commit_size=1000)
+    data.to_sql(name=name,con=con)
 
 
     #data = add_technical_col(data=data,t_name=name,date=None)
@@ -67,12 +76,11 @@ def writeToDBTrans():
 
 
 
-for i in ['trans']:
-    print("write: "+i)
-    if i not in 'trans':
-        writeToDB(i,',')
-    else:
-        writeToDB(i, ';')
+
+
+
+
+
 #
 #
 # d = DAG(dag_id='load_source',

@@ -24,6 +24,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/project/dags/test_ssh.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/project/docker-compose.yaml">
           <value>
             <Attribute>

@@ -7,3 +7,5 @@ pymongo
 pandasql
 termcolor2
 pymysql
+sshtunnel
+pymysql

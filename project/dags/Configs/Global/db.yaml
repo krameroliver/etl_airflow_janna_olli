@@ -1,7 +1,10 @@
 database:
-  user: oliver #postgres
+  user: dbuser #postgres
   password: 123456
-  port: 3307 #5432
+  port: 3306 #5432
   db_name: SenacorBank
-  host: 10.6.0.1  #VPN IP NAS
+  host: 82.165.203.114  #VPN IP NAS
   type: mariadb # postgres
+  sshhost: 82.165.203.114
+  sshuser: root
+  sshpw: Z4ykW#&q*5

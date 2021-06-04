@@ -17,7 +17,7 @@ from project.dags.utils.TechFields import add_technical_col
 
 
 def load(data: pd.DataFrame, db_con, t_name:str, date:str, schema:str=None,commit_size:int=10000):
-    con_s = "mysql+pymysql://oliver:123456@192.168.0.132:3307/src?charset=utf8mb4"  # 'postgresql://postgres:123456@OKRAMER-MAC:5432/BANK'
+    con_s = "mysql+pymysql://root:123456@82.165.203.114:3306/src?charset=utf8mb4"  # 'postgresql://postgres:123456@OKRAMER-MAC:5432/BANK'
     con = create_engine(con_s, echo=False, pool_recycle=3600)
     temp_table = t_name+time.time().__str__()
     metadata = MetaData(bind=db_con)

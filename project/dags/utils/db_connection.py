@@ -1,9 +1,13 @@
 # package import
 import yaml
 from sqlalchemy.engine import create_engine
+from sshtunnel import SSHTunnelForwarder
 
 
 def connect_to_db(layer:str=None):
+    tunnel = SSHTunnelForwarder(('SSH_HOST', 22), ssh_password=SSH_PASS, ssh_username=SSH_UNAME,
+                                remote_bind_address=(DB_HOST, 3306))
+    tunnel.start()
     with open(r'Configs/Global/db.yaml') as file:
         documents = yaml.full_load(file)
 
