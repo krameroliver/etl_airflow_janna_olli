@@ -2,7 +2,8 @@ import hashlib
 import os,sys
 import pandas as pd
 from sqlalchemy import create_engine
-from datetime import timedelta, datetime,time
+from datetime import timedelta, datetime
+import time
 import numpy as np
 
 
@@ -12,6 +13,7 @@ import numpy as np
 
 from utils.TechFields import add_technical_col
 from utils.db_loader import load_to_db
+from utils.loader import load
 
 default_args={
         "owner":"airflow",
@@ -23,6 +25,7 @@ default_args={
 def readData(name:str,dele:str=None):
     source_path = r"../rawdata/ENB/2018-12-31/"
     data = pd.read_csv(os.path.join(source_path,name+'.csv'), delimiter=dele, header=0)
+
     return data
 
 
@@ -36,12 +39,18 @@ def writeToDB(name:str,dele:str=None):
     con_s = "mysql+pymysql://oliver:123456@192.168.0.132:3307/src?charset=utf8mb4" #'postgresql://postgres:123456@OKRAMER-MAC:5432/BANK'
     con = create_engine(con_s, echo=False, pool_recycle=3600)
     data = readData(name,dele)
-    if name in 'trans':
-        data = filterData(data)
-    data = add_technical_col(data=data,t_name=name,date=None)
-    data = data.replace(np.nan,'')
+    print("ReadFinished")
+    print("write to temp table")
+    load(data=data, db_con=con, t_name=name, date='2018-12-31', schema='src',commit_size=1000)
+    #data.to_sql(name=name+'{t}'.format(t=time.time()),con=con,schema='src')
+
+
+    #data = add_technical_col(data=data,t_name=name,date=None)
+    #data = data.replace(np.nan,'NULL')
+    #data = data.sort_values('trans_id')
     #data.drop_duplicates(inplace=True)
-    load_to_db(data=data, db_con=con, t_name=name, date='2018-12-31', schema='src')
+    #print('loadDB')
+    #load_to_db(data=data, db_con=con, t_name=name, date='2018-12-31', schema='src',commit_size=1000)
     #data.to_sql(name=name,con=con,if_exists='append',index=False)
 
 

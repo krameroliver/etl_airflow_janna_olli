@@ -8,7 +8,7 @@ from termcolor2 import colored
 import numpy as np
 
 
-def load_to_db(data: pd.DataFrame, db_con, t_name, date, schema:str=None):
+def load_to_db(data: pd.DataFrame, db_con, t_name, date, schema:str=None,commit_size:int=10000):
     results_i = None
     results_u = None
     results_d = None
@@ -16,7 +16,7 @@ def load_to_db(data: pd.DataFrame, db_con, t_name, date, schema:str=None):
     #target_table_hist = None
 
     metadata = MetaData(bind=db_con)
-    #metadata.reflect(bind=db_con, schema=schema)
+    metadata.reflect(bind=db_con, schema=schema)
     print(metadata.sorted_tables)
     for table in [i for i in reversed(metadata.sorted_tables) if "_hist" not in i.name and i.name == t_name]:
         target_table = table
@@ -39,12 +39,12 @@ def load_to_db(data: pd.DataFrame, db_con, t_name, date, schema:str=None):
     # print(data[data[t_name+'_hk'] in insert_hk])
 
     data_list = []
-    expected_rows = 10000
+    expected_rows = commit_size
     i = 0
     j = expected_rows
     rows = data.shape[0]
     if rows > expected_rows:
-        chunks = np.ceil(rows/expected_rows)
+        chunks = int(np.ceil(rows/expected_rows))
         for x in range(chunks):
             df_sliced = data[i:j]
             data_list.append(df_sliced)
@@ -62,7 +62,7 @@ def load_to_db(data: pd.DataFrame, db_con, t_name, date, schema:str=None):
             insrt_stmnt = insert(target_table).values(values_list_i)
             results_i = db_con.execute(insrt_stmnt)
             # autocommit
-            print('commit')
+            #print('commit')
             db_con.execute('commit;')
     else:
         print(colored('INFO: Keine Insert-Saetze vorhanden', color='yellow'))

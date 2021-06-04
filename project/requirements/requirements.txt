@@ -7,7 +7,3 @@ pymongo
 pandasql
 termcolor2
 pymysql
-apache-airflow
-pandas-upsert-to-mysql
-connection
-stem

@@ -24,6 +24,27 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/project/docker-compose.yaml">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/rawdata/ENB/2018-12-31/disposition.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/rawdata/ENB/2018-12-31/trans.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/project/rawdata/ENB/CC/CRM Events.csv">
           <value>
             <Attribute>
