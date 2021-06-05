@@ -5,10 +5,8 @@ from sshtunnel import SSHTunnelForwarder
 
 
 def connect_to_db(layer:str=None):
-    tunnel = SSHTunnelForwarder(('SSH_HOST', 22), ssh_password=SSH_PASS, ssh_username=SSH_UNAME,
-                                remote_bind_address=(DB_HOST, 3306))
-    tunnel.start()
-    with open(r'Configs/Global/db.yaml') as file:
+
+    with open(r'../Configs/Global/db.yaml') as file:
         documents = yaml.full_load(file)
 
     user = documents['database']['user']
@@ -17,13 +15,16 @@ def connect_to_db(layer:str=None):
     dbname = documents['database']['db_name']
     host = documents['database']['host']
     db_type = documents['database']['type']
+    ssh_host = documents['database']['sshhost']
+    ssh_user = documents['database']['sshuser']
+    ssh_pwd = documents['database']['sshpw']
 
-    if db_type is 'mariadb':
-        con_profile = "mysql+pymysql://"+user+":"+str(psw)+"@"+host+":"+str(port)+"/"+layer+"?charset=utf8mb4"
-    elif db_type is 'postgres':
-        con_profile = db_type + '://' + user + ':' + str(psw) + '@' + host + ':' + str(port) + '/' + dbname
-    else:
-        con_profile = "mysql+pymysql://" + user + ":" + psw + "@" + host + "/" + layer + "?charset=utf8mb4"
-    con = create_engine(con_profile)
+    tunnel = SSHTunnelForwarder((ssh_host, 22), ssh_password=ssh_pwd, ssh_username=ssh_user,
+                                remote_bind_address=(host, port))
+    tunnel.start()
+    local_port = str(tunnel.local_bind_port)
+    c_str = "mysql+pymysql://"+str(user)+":"+str(psw)+"@"+str(host)+":" + str(local_port) + "/"+str(layer)+"?charset=utf8mb4"
+    con = create_engine(c_str)
+
     # print(con)
     return con
