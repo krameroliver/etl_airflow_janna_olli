@@ -10,4 +10,6 @@ card:
   businesskeys:
     - 'card_id'
   layer: 'src'
+  hash_key: 'card_hk'
+  table_type: 'satellit'
 

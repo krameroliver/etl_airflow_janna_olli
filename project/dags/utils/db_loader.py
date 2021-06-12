@@ -1,184 +1,158 @@
 import datetime
+import hashlib
 import os
 
 import pandas as pd
+import yaml
 # from Librarys.TechFiels import Techfields
-import sqlalchemy as db
-from sqlalchemy import MetaData, column
-from sqlalchemy import delete, insert, update, select
-from sqlalchemy.dialects import mysql
+from sqlalchemy import MetaData
+from sqlalchemy import delete, insert, select
 from sqlalchemy.dialects.mysql import insert
 from termcolor2 import colored
-import numpy as np
+
 from project.dags.utils.db_connection import connect_to_db
 
+class LoadtoDB():
+    def __init__(self, data: pd.DataFrame, db_con, t_name, date: str =None, schema: str = None, commit_size: int = 10000):
+        self.data=data
+        self.db_con=db_con
+        self.t_name=t_name
+        #self.date=date
+        self.schema=schema
+        self.commit_size=commit_size
+        self.target_table = None
 
-def load_to_db(data: pd.DataFrame, db_con, t_name, date, schema:str=None,commit_size:int=10000):
-    results_i = None
-    results_u = None
-    results_d = None
-    target_table = None
-    #target_table_hist = None
+        if date == None:
+            self.processing_date_start = datetime.date.today().strftime("%Y-%m-%d")
+        else:
+            self.processing_date_start = date
 
-    metadata = MetaData(bind=db_con)
-    metadata.reflect(bind=db_con, schema=schema)
+        with open(r'../Configs/ENB/' + t_name + '.yaml') as file:
+            self.documents = yaml.full_load(file)
+        self.hk = self.documents[t_name]['hash_key']
 
-    for table in [i for i in reversed(metadata.sorted_tables) if i.name == t_name]:
-        target_table = table
-        for c in target_table.columns:
-            if 'card_hk' in c.name:
-                col=c
+        self.metadata = MetaData(bind=self.db_con)
+        self.metadata.reflect(bind=self.db_con, schema=self.schema)
 
-    # print(metadata.tables[target_table.name])
-    #table_hk = list(pd.read_sql(sql='select {col}_hk from {schema}.{table};'.format(col=t_name, table=t_name, schema=schema), con=db_con)[t_name + '_hk'])
-    stmt = (select([col]))
+        for table in [i for i in reversed(self.metadata.sorted_tables) if i.name == t_name]:
+            self.target_table = table
+            for c in self.target_table.columns:
+                if self.hk in c.name:
+                    col = c
 
-    table_hk=list(db_con.execute(stmt).fetchall())
-    table_hk=[i[0] for i in table_hk]
-    print(table_hk)
+        stmt = (select([col]))
 
-    df_hk = list(data[t_name + '_hk'])
-    insert_hk = [i for i in df_hk if i not in table_hk]
-    print(colored('INFO: insert: ' + str(len(insert_hk)), 'green'))
-    delete_hk = [i for i in table_hk if i not in df_hk]
-    print(colored('INFO: delete:' + str(len(delete_hk)), 'green'))
-    update_hk = [i for i in table_hk if i in df_hk]
-    print(colored('INFO: update:' + str(len(update_hk)), 'green'))
+        table_hk = list(db_con.execute(stmt).fetchall())
+        table_hk = [i[0] for i in table_hk]
 
-    insert_df=data.loc[data[t_name+'_hk'].isin(insert_hk)]
-    delete_df = data.loc[data[t_name + '_hk'].isin(delete_hk)]
-    update_df = data.loc[data[t_name + '_hk'].isin(update_hk)]
+        df_hk = list(data[self.hk])
+        self.insert_hk = [i for i in df_hk if i not in table_hk]
+        self.delete_hk = [i for i in table_hk if i not in df_hk]
+        self.update_hk = [i for i in table_hk if i in df_hk]
 
-    conn = db_con.connect()
-    #insert:
-    for row in range(insert_df.shape[0]):
-        record=insert_df.iloc[row]
-        #print(record)
-        stmt = (insert(target_table).values(record))
-
-        conn.execute(stmt)
-        if row % commit_size == 0:
-            conn.execute('commit')
-
-    conn.execute('commit')
-
-    #delete:
-    #for row in range(delete_df.shape[0]):
-        #record=delete_df.iloc[row]
-    #delete_hk=tuple(delete_hk)
-    stmt = (delete(target_table).where(col == delete_hk))
-    d_hk="('"+"','".join(delete_hk)+"')"
-    print(datetime.date.today().strftime("%Y-%m-%d"))
-    stmt2="DELETE FROM "+ schema+"."+target_table.name+" FOR PORTION OF business_time FROM '" \
-          +datetime.date.today().strftime("%Y-%m-%d") + "' TO '2262-04-11' WHERE "+ t_name+'_hk'+" IN "+ d_hk+";"
-    #stmt2=stmt+ "for portion of business_time from '" +datetime.date.today() + "' to " + "'2262-04-11';"
-    #print(stmt.compile(dialect=mysql.dialect()))
-    conn.execute(stmt2)
+        self.insert_df = data.loc[data[self.hk].isin(self.insert_hk)]
+        self.delete_df = data.loc[data[self.hk].isin(self.delete_hk)]
+        self.update_df = data.loc[data[self.hk].isin(self.update_hk)]
 
 
+    def __repr__(self):
+        repr_str='table: '+self.target_table.name+'\n'\
+        +colored('INFO: insert: ' + str(len(self.insert_hk)), 'green')+'\n'\
+        +colored('INFO: delete:' + str(len(self.delete_hk)), 'green')+'\n'\
+        +colored('INFO: updates:' + str(self.update.shape[0]), 'green')
+
+        return(repr_str)
 
 
+    def insert(self):
+        conn = self.db_con.connect()
+        # insert:
+        print('Start Insert:')
+        self.insert_df['processing_date_start'] = self.processing_date_start
+        _anz=1
+        for row in range(self.insert_df.shape[0]):
+            record = self.insert_df.iloc[row]
+            # print(record)
+            stmt = (insert(self.target_table).values(record))
 
+            conn.execute(stmt)
+            if row % self.commit_size == 0:
+                conn.execute('commit')
+            if row % 100 ==0:
+                print('.', end=' ')
+                _anz=_anz+1
 
+        conn.execute('commit')
 
-    conn.close()
-    print('DB closed')
+        conn.close()
+        print('Ende Insert: DB closed')
 
-
-
-
-
-
-
-
-con=connect_to_db(layer="src")
-
-source_path = r"../../rawdata/ENB/2018-12-31/"
-data = pd.read_csv(os.path.join(source_path, 'card' + '.csv'), delimiter=',', header=0)
-data["card_hk"]=data['card_id']
-#data=data.iloc[0:10,:]
-load_to_db(data,con,"card","2018-12-31","src")
+    def delete(self):
+        conn = self.db_con.connect()
+        print('Start Delete:')
+        d_hk = "('" + "','".join(self.delete_hk) + "')"
+        stmt2 = "DELETE FROM " + self.schema + "." + self.target_table.name + " FOR PORTION OF business_time FROM '" \
+                + datetime.date.today().strftime("%Y-%m-%d") + "' TO '2262-04-11' WHERE " + self.hk + " IN " + d_hk + ";"
+        conn.execute(stmt2)
+        conn.close()
+        print('Ende Delete: DB closed')
 
 
 
-    #
-    # df_hk = list(data[t_name + '_hk'])
-    #
-    # insert_hk = [i for i in df_hk if i not in table_hk]
-    # print(colored('INFO: insert: ' + str(len(insert_hk)), 'green'))
-    # delete_hk = [i for i in table_hk if i not in df_hk]
-    # print(colored('INFO: delete:' + str(len(delete_hk)), 'green'))
-    # update_hk = [i for i in table_hk if i in df_hk]
-    # print(colored('INFO: update:' + str(len(update_hk)), 'green'))
-    # # values_list_i = data[data[t_name + '_hk'].isin(insert_hk)].to_dict('records')
-    # # print(data[data[t_name+'_hk'] in insert_hk])
-    #
-    # data_list = []
-    # expected_rows = commit_size
-    # i = 0
-    # j = expected_rows
-    # rows = data.shape[0]
-    # if rows > expected_rows:
-    #     chunks = int(np.ceil(rows/expected_rows))
-    #     for x in range(chunks):
-    #         df_sliced = data[i:j]
-    #         data_list.append(df_sliced)
-    #
-    #         i += expected_rows
-    #         j += expected_rows
-    # else:
-    #     data_list.append(data)
-    #
-    # if len(insert_hk) > 0:
-    #     for _data in data_list:
-    #         values_list_i = _data[_data[t_name + '_hk'].isin(insert_hk)].to_dict('records')
-    #     # insert
-    #
-    #         insrt_stmnt = insert(target_table).values(values_list_i)
-    #         results_i = db_con.execute(insrt_stmnt)
-    #         # autocommit
-    #         #print('commit')
-    #         db_con.execute('commit;')
-    # else:
-    #     print(colored('INFO: Keine Insert-Saetze vorhanden', color='yellow'))
-    #
-    # # delete
-    # if len(delete_hk) > 0:
-    #     delete_stmnt = delete(target_table).where(t_name + 'hk' in delete_hk)
-    #     results_d = db_con.execute(delete_stmnt)
-    # else:
-    #     print(colored('INFO: Keine Delete-Saetze vorhanden', color='yellow'))
-    #
-    # # update
-    # if len(update_hk) > 0:
-    #     table_diff_hk = pd.read_sql(
-    #         sql='select {col}_hk, diff_hk from {schema}.{table};'.format(col=t_name, table=t_name, schema=schema),
-    #         con=db_con)
-    #     df_diff_hk = data[[t_name + '_hk', 'diff_hk']]
-    #
-    #     table_diff_hk = table_diff_hk[table_diff_hk[t_name + '_hk'].isin(update_hk)]
-    #     df_diff_hk = df_diff_hk[df_diff_hk[t_name + '_hk'].isin(update_hk)]
-    #     merge_hk = pd.merge(table_diff_hk, df_diff_hk, how='inner', on=t_name + '_hk')
-    #     merge_hk = merge_hk[merge_hk.apply(lambda x: x['diff_hk_x'] != x['diff_hk_y'], axis=1)]
-    #     update_hk = list(merge_hk[t_name + '_hk'])
-    #     if len(update_hk) > 0:
-    #         data['mod_flg'] = 'U'
-    #         data = data[data[t_name + '_hk'].isin(update_hk)]
-    #         data.drop(inplace=True, columns=['record_source', 'processing_date_end'])
-    #         values_list_u = data.to_dict('records')
-    #
-    #         for i in update_hk:
-    #             update_stmnt = db.update(target_table).values(values_list_u[t_name + '_hk' == i]).where(
-    #                 getattr(target_table.c, t_name + '_hk') == i)
-    #             db_con.execute(update_stmnt)
-    #
-    #             #update_stmnt_hist = db.update(target_table_hist).values({'processing_date_end': date}).where(
-    #              #   getattr(target_table_hist.c, t_name + '_hk') == i)
-    #             #results_u = db_con.execute(update_stmnt_hist)
-    #     else:
-    #         print(colored('INFO: Keine Update-Saetze vorhanden', color='yellow'))
-    # else:
-    #     print(colored('INFO: Keine potentiellen Update-Saetze vorhanden', color='yellow'))
-    #
-    # return results_i, results_d, results_u
-    #
+    def update(self):
+        conn = self.db_con.connect()
+        print('Start Update:')
+        fields = self.documents[self.target_table.name]['fields']
+        fields.append('diff_hk')
+        table_u_hk = "('" + "','".join(self.update_hk) + "')"
+        stmt_diffs = "select diff_hk, " + self.hk + " from " + self.schema + "." + self.target_table.name + " where " + self.hk + " in " + table_u_hk + \
+                     " and processing_date_end='2262-04-11';"
+        table_u_list = self.db_con.execute(stmt_diffs).fetchall()
+        table_u_df = pd.DataFrame(columns=['diff_hk', self.hk])
+        for i in table_u_list:
+            table_u_df = table_u_df.append({'diff_hk': i[0], self.hk: i[1]}, ignore_index=True)
+
+        self.update_df['diff_str'] = self.update_df.astype(str).agg('|'.join, axis=1)
+        self.update_df["diff_hk"] = self.update_df['diff_str'].astype(str).apply(
+            lambda x: hashlib.md5(x.encode()).hexdigest().upper())
+        self.update_df.drop(inplace=True, columns='diff_str')
+
+        join_update = self.update_df.merge(table_u_df, how='inner', on=self.hk, suffixes=['', '_tudf'])
+
+        self.update = join_update[join_update['diff_hk'] != join_update['diff_hk_tudf']]
+        # print(update)
+        #print(colored('INFO: update:' + str(update.shape[0]), 'green'))
+        for row in range(self.update.shape[0]):
+            record = self.update.iloc[row]
+            u_hk = record[self.hk]
+            set_part = []
+            for col in fields:
+                set_part.append(self.target_table.name+ "." + col + "=" + "'" + str(record[col]) + "'")
+            set_part = ",\n".join(set_part)
+            # print(set_part)
+            stmt3 = "UPDATE " + self.schema + "." + self.target_table.name + " FOR PORTION OF business_time FROM '" + datetime.date.today().strftime(
+                "%Y-%m-%d") + "' TO '2262-04-11' SET " + set_part + ", mod_flg = 'U'  WHERE " + self.hk + " = '" + u_hk + "';"
+
+            conn.execute(stmt3)
+            if row % self.commit_size == 0:
+                conn.execute('commit')
+            if row % 100 == 0:
+                print('.', end=' ')
+
+        conn.close()
+        print('Ende Update: DB closed')
+
+
+#
+# con = connect_to_db(layer="src")
+#
+# source_path = r"../../rawdata/ENB/2018-12-31/"
+# data = pd.read_csv(os.path.join(source_path, 'card' + '.csv'), delimiter=',', header=0)
+# data["card_hk"] = data['card_id']
+# data=data.iloc[0:10,:]
+# l=LoadtoDB(data=data, db_con=con, t_name="card", date="2018-12-31", schema="src")
+# l.insert()
+# l.update()
+# l.delete()
+# print(l)
+

@@ -10,3 +10,5 @@ acct:
   businesskeys:
     - 'account_id'
   layer: 'src'
+  hash_key: 'acct_hk'
+  table_type: 'satellit'

@@ -22,3 +22,5 @@ client:
   businesskeys:
     - 'client_id'
   layer: 'src'
+  hash_key: 'client_hk'
+  table_type: 'satellit'
