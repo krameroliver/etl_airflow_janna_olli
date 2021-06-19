@@ -36,3 +36,5 @@ trans:
   businesskeys:
     - 'trans_id'
   layer: 'src'
+  hash_key: 'trans_hk'
+  table_type: 'satellit'

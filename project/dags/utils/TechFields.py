@@ -4,7 +4,10 @@ import hashlib
 
 
 def add_technical_col(data: pd.DataFrame,t_name:str,date:str=None):
-    with open(r'../Configs/ENB/{entity}.yaml'.format(entity=t_name)) as file:
+
+
+
+    with open(r'/Configs/ENB/{entity}.yaml'.format(entity=t_name)) as file:
         documents = yaml.full_load(file)
     data = data[documents['{entity}'.format(entity=t_name)]['fields']]
     f = documents['{entity}'.format(entity=t_name)]['fields']

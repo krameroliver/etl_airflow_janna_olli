@@ -2,8 +2,8 @@ import pandas as pd
 import yaml
 from termcolor2 import colored
 
-from project.dags.utils.db_connection import connect_to_db
-from project.dags.utils.db_loader import LoadtoDB
+from utils.db_connection import connect_to_db
+from utils.db_loader import LoadtoDB
 
 
 class DataVaultLoader():
@@ -19,7 +19,7 @@ class DataVaultLoader():
         self.target_table = None
 
 
-        with open(r'../Configs/ENB/' + self.t_name + '.yaml') as file:
+        with open(r'/Configs/ENB/' + self.t_name + '.yaml') as file:
             self.documents = yaml.full_load(file)
         self.table_type = self.documents[self.t_name]['table_type']
 

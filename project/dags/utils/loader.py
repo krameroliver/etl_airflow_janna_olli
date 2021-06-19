@@ -13,7 +13,7 @@ from sqlalchemy.connectors import Connector
 import pandas_upsert_to_mysql.table as table
 from sqlalchemy.connectors import Connector
 
-from project.dags.utils.TechFields import add_technical_col
+from utils.TechFields import add_technical_col
 
 
 def load(data: pd.DataFrame, db_con, t_name:str, date:str, schema:str=None,commit_size:int=10000):

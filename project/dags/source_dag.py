@@ -1,8 +1,9 @@
 from airflow import DAG
+from airflow.lineage import LineageBackend
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
 from datetime import timedelta, datetime
-from project.dags.source_beladung.source_load import read_write_source
+from source_beladung.source_load import read_write_source
 
 default_args={
         "owner":"airflow",
@@ -51,7 +52,43 @@ load_db_client = PythonOperator(
     dag=d
 )
 
+load_db_disposition = PythonOperator(
+    task_id="load_disposition",
+    python_callable=read_write_source,
+    provide_context=True,
+    op_kwargs={'file': 'disposition.csv', 'date': "2018-12-31", 'table': 'disposition', 'header': 0, 'delm': ','},
+    dag=d
+)
+load_db_district = PythonOperator(
+   task_id="load_district",
+   python_callable=read_write_source,
+   provide_context=True,
+   op_kwargs={'file': 'district.csv', 'date': "2018-12-31", 'table': 'district', 'header': 0, 'delm': ','},
+   dag=d
+)
+load_db_loan = PythonOperator(
+   task_id="load_loan",
+   python_callable=read_write_source,
+   provide_context=True,
+   op_kwargs={'file': 'loan.csv', 'date': "2018-12-31", 'table': 'loan', 'header': 0, 'delm': ','},
+   dag=d
+)
 
+load_db_order = PythonOperator(
+    task_id="load_order",
+    python_callable=read_write_source,
+    provide_context=True,
+    op_kwargs={'file': 'order.csv', 'date': "2018-12-31", 'table': 'order', 'header': 0, 'delm': ','},
+    dag=d
+)
 
+load_db_trans = PythonOperator(
+    task_id="load_trans",
+    python_callable=read_write_source,
+    provide_context=True,
+    op_kwargs={'file': 'trans.csv', 'date': "2018-12-31", 'table': 'trans', 'header': 0, 'delm': ';'},
+    dag=d
+)
 
-startAllTasks >> [load_db_acct,load_db_card,load_db_client] >> endTasks
+startAllTasks >> [load_db_acct,load_db_card,load_db_client,load_db_trans,load_db_order,load_db_loan,load_db_district,load_db_disposition] >> endTasks
+#startAllTasks >> load_db_acct >> endTasks

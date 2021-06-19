@@ -13,3 +13,5 @@ geschaeftspartner:
   businesskeys:
     - 'kundennummer'
   layer: 'biz'
+  hash_key: 'gp_hk'
+  table_type: 'satellit'

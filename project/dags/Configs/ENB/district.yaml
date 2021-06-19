@@ -1,0 +1,13 @@
+district:
+  fields:
+    - 'district_id'
+    - 'city'
+    - 'state_name'
+    - 'state_abbrev'
+    - 'region'
+    - 'division'
+  businesskeys:
+     - 'district_id'
+  layer: 'src'
+  hash_key: 'district_hk'
+  table_type: 'satellit'

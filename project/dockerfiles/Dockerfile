@@ -8,3 +8,5 @@ RUN pip install pandasql
 RUN pip install termcolor2
 RUN pip install --no-cache-dir pymysql
 RUN pip install  sshtunnel
+RUN pip install marquez-python
+RUN pip install marquez-airflow

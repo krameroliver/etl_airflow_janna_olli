@@ -10,7 +10,8 @@ from sqlalchemy import delete, insert, select
 from sqlalchemy.dialects.mysql import insert
 from termcolor2 import colored
 
-from project.dags.utils.db_connection import connect_to_db
+from utils.utils import divide_chunks
+
 
 class LoadtoDB():
     def __init__(self, data: pd.DataFrame, db_con, t_name, date: str =None, schema: str = None, commit_size: int = 10000):
@@ -27,7 +28,7 @@ class LoadtoDB():
         else:
             self.processing_date_start = date
 
-        with open(r'../Configs/ENB/' + t_name + '.yaml') as file:
+        with open(r'/Configs/ENB/' + t_name + '.yaml') as file:
             self.documents = yaml.full_load(file)
         self.hk = self.documents[t_name]['hash_key']
 
@@ -70,17 +71,28 @@ class LoadtoDB():
         print('Start Insert:')
         self.insert_df['processing_date_start'] = self.processing_date_start
         _anz=1
-        for row in range(self.insert_df.shape[0]):
-            record = self.insert_df.iloc[row]
-            # print(record)
-            stmt = (insert(self.target_table).values(record))
+        print(self.insert_df)
+        record_list = self.insert_df.to_dict('record')
+        chunks = divide_chunks(record_list,self.commit_size)
 
-            conn.execute(stmt)
-            if row % self.commit_size == 0:
-                conn.execute('commit')
-            if row % 100 ==0:
-                print('.', end=' ')
-                _anz=_anz+1
+        for i in chunks:
+            self.target_table.name=self.t_name
+            conn.execute(self.target_table.insert(),i)
+            #conn.execute(stmt)
+            #self.target_table.insert().execute(i)
+
+        # for row in range(self.insert_df.shape[0]):
+        #     record = self.insert_df.iloc[row]
+        #     # print(record)
+        #
+        #     stmt = (insert(self.target_table).values(record))
+        #
+        #     conn.execute(stmt)
+        #     if row % self.commit_size == 0:
+        #         conn.execute('commit')
+        #     if row % 100 ==0:
+        #         print('.', end=' ')
+        #         _anz=_anz+1
 
         conn.execute('commit')
 
@@ -142,17 +154,4 @@ class LoadtoDB():
         conn.close()
         print('Ende Update: DB closed')
 
-
-#
-# con = connect_to_db(layer="src")
-#
-# source_path = r"../../rawdata/ENB/2018-12-31/"
-# data = pd.read_csv(os.path.join(source_path, 'card' + '.csv'), delimiter=',', header=0)
-# data["card_hk"] = data['card_id']
-# data=data.iloc[0:10,:]
-# l=LoadtoDB(data=data, db_con=con, t_name="card", date="2018-12-31", schema="src")
-# l.insert()
-# l.update()
-# l.delete()
-# print(l)
 

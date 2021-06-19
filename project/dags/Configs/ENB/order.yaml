@@ -9,3 +9,5 @@ order:
   businesskeys:
     - 'order_id'
   layer: 'src'
+  hash_key: 'order_hk'
+  table_type: 'satellit'

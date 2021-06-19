@@ -6,7 +6,7 @@ from sshtunnel import SSHTunnelForwarder
 
 def connect_to_db(layer:str=None):
 
-    with open(r'../Configs/Global/db.yaml') as file:
+    with open(r'/Configs/Global/db.yaml') as file:
         documents = yaml.full_load(file)
 
     user = documents['database']['user']

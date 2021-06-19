@@ -15,3 +15,5 @@ loan:
   businesskeys:
     - 'loan_id'
   layer: 'src'
+  hash_key: 'loan_hk'
+  table_type: 'satellit'

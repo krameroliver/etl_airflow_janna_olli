@@ -7,3 +7,5 @@ disposition:
   businesskeys:
     - 'disp_id'
   layer: 'src'
+  hash_key: 'disposition_hk'
+  table_type: 'satellit'

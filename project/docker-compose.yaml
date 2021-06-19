@@ -52,6 +52,7 @@ x-airflow-common:
     AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
     AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true'
   volumes:
+    - ./dags/Configs:/Configs
     - ./dags:/opt/airflow/dags
     - ./requiremnets:/reqirements
     - ./logs:/opt/airflow/logs
@@ -106,6 +107,8 @@ services:
     restart: always
 
   airflow-scheduler:
+    env_file:
+      - marquez.env
     <<: *airflow-common
     command: scheduler
     restart: always
