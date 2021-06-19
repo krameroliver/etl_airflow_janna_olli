@@ -1,22 +1,23 @@
 # Import Pakete
 # import utils as u
 # import utils as u
+
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from termcolor2 import colored
 
 import pandas as pd
 import yaml
-try:
-    from utils.TableReader import readTableFromDB
-    from utils.db_connection import connect_to_db
-    from utils.TechFields import add_technical_col
-    from utils.db_loader import LoadtoDB
-except ImportError:
-    from project.dags.utils.TableReader import readTableFromDB
-    from project.dags.utils.db_connection import connect_to_db
-    from project.dags.utils.TechFields import add_technical_col
-    from project.dags.utils.db_loader import LoadtoDB
+#try:
+from utils.TableReader import read_raw_sql
+from utils.db_connection import connect_to_db
+from utils.TechFields import add_technical_col
+from utils.db_loader import LoadtoDB
+# except ImportError:
+#from project.dags.utils.TableReader import read_raw_sql
+#from project.dags.utils.db_connection import connect_to_db
+#from project.dags.utils.TechFields import add_technical_col
+#from project.dags.utils.db_loader import LoadtoDB
 
 class Gp:
     def __init__(self, date):
@@ -30,18 +31,17 @@ class Gp:
         self.src_card = 'card'
 
     def join(self):
-        client = readTableFromDB(db_con=connect_to_db(), date=self.date, schema=self.schema_src, t_name=self.src_client)
-        dispo = readTableFromDB(db_con=connect_to_db(), date=self.date, schema=self.schema_src, t_name=self.src_disp)
-        card = readTableFromDB(db_con=connect_to_db(), date=self.date, schema=self.schema_src, t_name=self.src_card)
+        client = read_raw_sql(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src, t_name=self.src_client)
+        dispo = read_raw_sql(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src, t_name=self.src_disp)
+        card = read_raw_sql(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src, t_name=self.src_card)
 
         data = client.merge(dispo, how='inner', left_on='client_id', right_on='client_id').merge(card, how='inner',
                                                                                                  left_on='disp_id',
                                                                                                  right_on='disp_id')
-        print(data.columns)
         return data
 
     def mapping(self, data: pd.DataFrame):
-        with open(r'Configs/ENB/{entity}.yaml'.format(entity=self.target)) as file:
+        with open(r'/Configs/ENB/{entity}.yaml'.format(entity=self.target)) as file:
             documents = yaml.full_load(file)
 
         out_data = pd.DataFrame(columns=documents['geschaeftspartner']['fields'])
@@ -74,9 +74,10 @@ class Gp:
     def writeToDB(self,data:pd.DataFrame):
         print(colored('INFO: Tabelle ' + self.target, color='green'))
         con = connect_to_db()
-        with open(r'Configs/ENB/{entity}.yaml'.format(entity=self.target)) as file:
+        with open(r'/Configs/ENB/{entity}.yaml'.format(entity=self.target)) as file:
             documents = yaml.full_load(file)
         schema = documents['{entity}'.format(entity=self.target)]['layer']
         data = add_technical_col(data=data,t_name=self.target,date=self.date)
-        load_to_db(data=data, db_con=con, t_name=self.target, date=self.date, schema=schema)
+        LoadtoDB(data=data, db_con=con, t_name=self.target, date=self.date, schema=schema)
         print('--- Beladung Ende ---\n')
+

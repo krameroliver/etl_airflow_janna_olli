@@ -17,6 +17,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/project/dags/biz_beladung/geschaeftspartner.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/project/dags/firstDAG.py">
           <value>
             <Attribute>
@@ -31,6 +38,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/project/dags/utils/TableReader.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/project/docker-compose.yaml">
           <value>
             <Attribute>
@@ -38,7 +52,42 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/project/rawdata/ENB/2018-12-31/acct.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/rawdata/ENB/2018-12-31/card.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/rawdata/ENB/2018-12-31/client.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/project/rawdata/ENB/2018-12-31/disposition.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/rawdata/ENB/2018-12-31/loan.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/rawdata/ENB/2018-12-31/order.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

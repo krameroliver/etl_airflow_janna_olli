@@ -10,3 +10,4 @@ RUN pip install --no-cache-dir pymysql
 RUN pip install  sshtunnel
 RUN pip install marquez-python
 RUN pip install marquez-airflow
+RUN pip install pymysql
