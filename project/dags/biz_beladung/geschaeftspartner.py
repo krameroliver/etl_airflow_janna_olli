@@ -3,16 +3,20 @@
 # import utils as u
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
-from utils.db_loader import load_to_db
 from termcolor2 import colored
 
 import pandas as pd
 import yaml
-
-from utils.TableReader import readTableFromDB
-from utils.db_connection import connect_to_db
-from utils.TechFields import add_technical_col
-
+try:
+    from utils.TableReader import readTableFromDB
+    from utils.db_connection import connect_to_db
+    from utils.TechFields import add_technical_col
+    from utils.db_loader import LoadtoDB
+except ImportError:
+    from project.dags.utils.TableReader import readTableFromDB
+    from project.dags.utils.db_connection import connect_to_db
+    from project.dags.utils.TechFields import add_technical_col
+    from project.dags.utils.db_loader import LoadtoDB
 
 class Gp:
     def __init__(self, date):

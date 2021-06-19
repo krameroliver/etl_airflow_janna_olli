@@ -9,8 +9,10 @@ from sqlalchemy import MetaData
 from sqlalchemy import delete, insert, select
 from sqlalchemy.dialects.mysql import insert
 from termcolor2 import colored
-
-from utils.utils import divide_chunks
+try:
+    from utils.utils import divide_chunks
+except ImportError:
+    from project.dags.utils.utils import divide_chunks
 
 
 class LoadtoDB():

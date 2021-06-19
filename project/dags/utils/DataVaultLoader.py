@@ -1,10 +1,12 @@
 import pandas as pd
 import yaml
 from termcolor2 import colored
-
-from utils.db_connection import connect_to_db
-from utils.db_loader import LoadtoDB
-
+try:
+    from utils.db_connection import connect_to_db
+    from utils.db_loader import LoadtoDB
+except ImportError:
+    from project.dags.utils.db_connection import connect_to_db
+    from project.dags.utils.db_loader import LoadtoDB
 
 class DataVaultLoader():
 
