@@ -7,7 +7,7 @@ from source_beladung.source_load import read_write_source
 
 default_args={
         "owner":"airflow",
-        'retries':2,
+        'retries':0‚,
         'retry_delay':timedelta(minutes=0.5),
         'start_date': datetime(2021,6,12)
     }
