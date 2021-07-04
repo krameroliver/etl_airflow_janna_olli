@@ -24,6 +24,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/project/dags/Configs/ENB/trans.yaml">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/project/dags/biz_beladung/darlehen.py">
           <value>
             <Attribute>

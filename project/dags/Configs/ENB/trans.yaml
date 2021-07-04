@@ -18,6 +18,7 @@ trans:
         - 'fulldate'
         - 'fulltime'
         - 'fulldatewithtime'
+        - 'date'
       data_types:
         - 'Int64'
         - 'str'
@@ -32,9 +33,10 @@ trans:
         - 'Int64'
         - 'Int64'
         - 'Int64'
-        - 'date'
-        - 'time'
-        - '%Y-%m-%dT%H:%M:%S'
+        - 'DATUM'
+        - 'DATUM'
+        - 'DATUM'
+        - 'DATUM'
       businesskeys:
         - 'trans_id'
       layer: 'src'
