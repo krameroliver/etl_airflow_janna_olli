@@ -38,6 +38,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/project/dags/biz_beladung/l_cc_konto.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/project/dags/biz_beladung/l_cc_trans.py">
           <value>
             <Attribute>

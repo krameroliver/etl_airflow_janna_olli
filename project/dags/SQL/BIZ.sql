@@ -5,7 +5,7 @@ geschaeftspartner_hk CHAR(32),
 PRIMARY KEY(link_gp_cc_hk)
 );
 
-CREATE TABLE biz.l_s_gp_cc(
+CREATE TABLE biz.l_m_gp_cc(
 gp_cc_hk CHAR(32),
 kreditkarte_hk CHAR(32),
 geschaeftspartner_hk CHAR(32),
@@ -18,25 +18,25 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(gp_cc_hk)
+PRIMARY KEY(gp_cc_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
 ---------------------------------
 
 
 
-CREATE TABLE biz.l_cc_trans(
-cc_trans_hk CHAR(32),
+CREATE TABLE biz.l_cc_konto(
+cc_konto_hk CHAR(32),
 kreditkarte_hk CHAR(32),
-transaktion_hk CHAR(32),
+konto_hk CHAR(32),
 PRIMARY KEY(cc_trans_hk)
 );
 
-CREATE TABLE biz.l_m_cc_trans(
-cc_trans_hk CHAR(32),
-transaktions_typ INTEGER,
+CREATE TABLE biz.l_m_cc_konto(
+cc_konto_hk CHAR(32),
+rolle INT,
 kreditkarte_hk CHAR(32) INVISIBLE,
-transaktion_hk CHAR(32) INVISIBLE,
+konto_hk CHAR(32) INVISIBLE,
 processing_date_start DATE DEFAULT NOW(),
 processing_date_end   DATE DEFAULT '2262-04-11',
 createte_at TIMESTAMP(6) AS ROW START INVISIBLE,
@@ -46,12 +46,35 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(cc_trans_hk)
+PRIMARY KEY(cc_konto_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
 
+----------------------------------------
 
+CREATE TABLE biz.h_konto(
+kontonummer VARCHAR(18),
+konto_hk CHAR(32),
+PRIMARY KEY(konto_hk));
 
+CREATE TABLE biz.s_konto(
+kontonummer VARCHAR(18),
+frequenz INTEGER,
+wertstellungstag DATE,
+processing_date_start DATE DEFAULT NOW(),
+processing_date_end   DATE DEFAULT '2262-04-11',
+createte_at TIMESTAMP(6) AS ROW START INVISIBLE,
+modified_at TIMESTAMP(6) AS ROW END INVISIBLE,
+record_source varchar(255),
+geschaeftspartner_hk CHAR(32),
+diff_hk CHAR(32),
+mod_flg CHAR(1),
+PERIOD FOR business_time(processing_date_start, processing_date_end),
+PERIOD FOR system_time(createte_at, modified_at),
+PRIMARY KEY(geschaeftspartner_hk,kontakttyp,processing_date_end)
+)WITH SYSTEM VERSIONING;
+
+----------------------------------------
 CREATE TABLE biz.h_geschaeftspartner(
 kundennummer VARCHAR(18),
 geschaeftspartner_hk CHAR(32),
@@ -71,7 +94,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(geschaeftspartner_hk,kontakttyp)
+PRIMARY KEY(geschaeftspartner_hk,kontakttyp,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
 CREATE TABLE biz.s_geschaeftspartner_postalische_addresse(
@@ -91,7 +114,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(geschaeftspartner_hk)
+PRIMARY KEY(geschaeftspartner_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
 
@@ -116,7 +139,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(geschaeftspartner_hk)
+PRIMARY KEY(geschaeftspartner_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
 
@@ -141,7 +164,7 @@ darlehen_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(darlehen_hk)
+PRIMARY KEY(darlehen_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
 
@@ -166,7 +189,7 @@ kreditkarte_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(kreditkarte_hk)
+PRIMARY KEY(kreditkarte_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
 
@@ -193,7 +216,7 @@ transaktion_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(transaktion_hk)
+PRIMARY KEY(transaktion_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
 

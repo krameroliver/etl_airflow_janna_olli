@@ -1,0 +1,20 @@
+konto:
+  tables:
+    s_konto:
+      fields:
+        - 'kontonummer'
+        - 'frequenz'
+        - 'wertstellungstag'
+      businesskeys:
+        - 'kontonummer'
+      layer: 'biz'
+      hash_key: 'konto_hk'
+      table_type: 'satellit'
+    h_konto:
+      fields:
+        - 'kontonummer'
+      businesskeys:
+        - 'kontonummer'
+      layer: 'biz'
+      hash_key: 'konto_hk'
+      table_type: 'satellit'

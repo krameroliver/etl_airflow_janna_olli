@@ -50,10 +50,7 @@ class DataVaultLoader():
             print(colored('ERROR:', color='red') + ' Kein Zulaessiger Tabellen-Typ gefunden')
 
     def satellit(self):
-        try:
-            self.Loader.insert()
-        except:
-            logging.warn('inserts not done!')
+        self.Loader.insert()
         self.Loader.update()
         self.Loader.delete()
 
@@ -72,15 +69,3 @@ class DataVaultLoader():
     def __repr__(self):
         return (self.Loader.__repr__())
 
-# con = connect_to_db(layer="src")
-#
-# source_path = r"../../rawdata/ENB/2018-12-31/"
-# data = pd.read_csv(os.path.join(source_path, 'card' + '.csv'), delimiter=',', header=0)
-# data["card_hk"] = data['card_id']
-# #data=data.iloc[0:10,:]
-# l=DataVaultLoader(data=data, db_con=con, t_name="card", date="2018-12-31", schema="src")
-# l.load
-# #l.insert()
-# #l.update()
-# #l.delete()
-# print(l)

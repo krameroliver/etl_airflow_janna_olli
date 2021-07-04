@@ -22,7 +22,6 @@ class LoadtoDB():
         self.data = data
         self.db_con = db_con
         self.t_name = t_name
-        # self.date=date
         self.schema = schema
         self.commit_size = commit_size
         self.target_table = None
@@ -52,15 +51,8 @@ class LoadtoDB():
         self.metadata = MetaData(bind=self.db_con)
         self.metadata.reflect(bind=self.db_con, schema=self.schema)
 
-        if entityName == None:
-            coln = t_name
-        else:
-            coln = self.entityName
-
         for table in [i for i in reversed(self.metadata.sorted_tables) if self.t_name == i.name]:
             self.target_table = table
-            print(table)
-            logging.info(table)
             for c in self.target_table.columns:
                 if self.hk in c.name:
                     col = c
@@ -78,6 +70,7 @@ class LoadtoDB():
         self.insert_df = data.loc[data[self.hk].isin(self.insert_hk)]
         self.delete_df = data.loc[data[self.hk].isin(self.delete_hk)]
         self.update_df = data.loc[data[self.hk].isin(self.update_hk)]
+
 
     def __repr__(self):
         repr_str = 'table: ' + self.target_table.name + '\n' \

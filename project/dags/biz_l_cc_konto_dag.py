@@ -6,14 +6,14 @@ from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from datetime import timedelta, datetime
 from airflow.sensors.external_task import ExternalTaskSensor
 
-from biz_beladung.l_cc_trans import Link_CC_Trans
+from biz_beladung.l_cc_konto import Link_CC_Konto
 
 default_args={
         "owner":"airflow",
         'start_date': datetime(2021,6,12)
     }
 
-link = Link_CC_Trans('2018-12-31')
+link = Link_CC_Konto('2018-12-31')
 def join(**kwargs):
     data=link.join()
     return data
@@ -31,7 +31,7 @@ def load(**kwargs):
     link.writeToDB(data_to_db)
 
 
-d = DAG(dag_id='load_link_cc_trans_biz',
+d = DAG(dag_id='load_link_cc_konto_biz',
         schedule_interval="@daily",
         default_args=default_args,
         catchup=False)
@@ -57,24 +57,24 @@ endTasks = BashOperator(
 
 
 
-link_cc_trans_join = PythonOperator(
-    task_id="link_cc_trans_join",
+link_cc_konto_join = PythonOperator(
+    task_id="link_cc_konto_join",
     python_callable=join,
     provide_context=True,
     #op_kwargs={},
     dag=d
 )
 
-link_cc_trans_map = PythonOperator(
-    task_id="link_cc_trans_map",
+link_cc_konto_map = PythonOperator(
+    task_id="link_cc_konto_map",
     python_callable=mapping,
     provide_context=True,
     #op_kwargs={},
     dag=d
 )
 
-link_cc_trans_load = PythonOperator(
-   task_id="link_cc_trans_load",
+link_cc_konto_load = PythonOperator(
+   task_id="link_cc_konto_load",
    python_callable=load,
    provide_context=True,
    #op_kwargs={},
@@ -82,4 +82,4 @@ link_cc_trans_load = PythonOperator(
 )
 
 
-src_dependency >> startAllTasks >> link_cc_trans_join >> link_cc_trans_map >> link_cc_trans_load >> endTasks
+src_dependency >> startAllTasks >> link_cc_konto_join >> link_cc_konto_map >> link_cc_konto_load >> endTasks
