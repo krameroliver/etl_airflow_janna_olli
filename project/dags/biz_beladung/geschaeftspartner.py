@@ -1,25 +1,23 @@
 # Import Pakete
 # import utils as u
 # import utils as u
-
+import os
 from datetime import datetime
 
 import pandas as pd
 import yaml
 from dateutil.relativedelta import relativedelta
 from termcolor2 import colored
-from utils.DataVaultLoader import DataVaultLoader
-# try:
-from utils.TableReader import read_raw_sql_sat
-from utils.TechFields import add_technical_col
-from utils.db_connection import connect_to_db
-
-
-# except ImportError:
-# from project.dags.utils.TableReader import read_raw_sql
-# from project.dags.utils.db_connection import connect_to_db
-# from project.dags.utils.TechFields import add_technical_col
-# from project.dags.utils.db_loader import LoadtoDB
+try:
+    from utils.DataVaultLoader import DataVaultLoader
+    from utils.TableReader import read_raw_sql_sat
+    from utils.TechFields import add_technical_col
+    from utils.db_connection import connect_to_db
+except ImportError:
+    from project.dags.utils.DataVaultLoader import DataVaultLoader
+    from project.dags.utils.TableReader import read_raw_sql_sat
+    from project.dags.utils.TechFields import add_technical_col
+    from project.dags.utils.db_connection import connect_to_db
 
 class Gp:
     def __init__(self, date):
@@ -31,6 +29,10 @@ class Gp:
         self.src_client = 'client'
         self.src_disp = 'disposition'
         self.src_card = 'card'
+        if os.path.isdir(r'/Configs/ENB/'):
+            self.conf_r = r'/Configs/ENB/'
+        else:
+            self.conf_r = r'../Configs/ENB/'
 
     def join(self):
         client = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
@@ -111,9 +113,6 @@ class Gp:
         - 'kontakttyp'
         - 'kontaktinfo'
         '''
-
-        out_data = pd.DataFrame()
-
         '''
         Schritt 1: telefonnummer daten filtern
         '''
@@ -142,7 +141,7 @@ class Gp:
         print(colored('INFO: Entity ' + self.target, color='green'))
         con = connect_to_db(layer=self.schema_trg)
         sat_data = add_technical_col(data=data, t_name='s_geschaeftspartner', date=self.date, entity_name=self.target)
-        with open(r'/Configs/ENB/' + self.target + '.yaml') as file:
+        with open(self.conf_r + self.target + '.yaml') as file:
             documents = yaml.full_load(file)
         hub_target_fields = documents[self.target]['tables']['h_' + self.target]['fields']
         hub_res_data = pd.DataFrame(columns=hub_target_fields)
@@ -162,7 +161,7 @@ class Gp:
         con = connect_to_db(layer=self.schema_trg)
         sat_data = add_technical_col(data=data, t_name='s_geschaeftspartner_postalische_addresse', date=self.date,
                                      entity_name=self.target)
-        with open(r'/Configs/ENB/' + self.target + '.yaml') as file:
+        with open(self.conf_r + self.target + '.yaml') as file:
             documents = yaml.full_load(file)
         hub_target_fields = documents[self.target]['tables']['h_' + self.target]['fields']
         hub_res_data = pd.DataFrame(columns=hub_target_fields)
@@ -182,7 +181,7 @@ class Gp:
         con = connect_to_db(layer=self.schema_trg)
         sat_data = add_technical_col(data=data, t_name='m_geschaeftspartner_digitale_addresse', date=self.date,
                                      entity_name=self.target)
-        with open(r'/Configs/ENB/' + self.target + '.yaml') as file:
+        with open(self.conf_r + self.target + '.yaml') as file:
             documents = yaml.full_load(file)
         hub_target_fields = documents[self.target]['tables']['h_' + self.target]['fields']
         hub_res_data = pd.DataFrame(columns=hub_target_fields)

@@ -66,12 +66,12 @@ processing_date_end   DATE DEFAULT '2262-04-11',
 createte_at TIMESTAMP(6) AS ROW START INVISIBLE,
 modified_at TIMESTAMP(6) AS ROW END INVISIBLE,
 record_source varchar(255),
-geschaeftspartner_hk CHAR(32),
+konto_hk CHAR(32),
 diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(geschaeftspartner_hk,kontakttyp,processing_date_end)
+PRIMARY KEY(konto_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
 ----------------------------------------

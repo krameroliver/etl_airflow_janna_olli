@@ -1,7 +1,7 @@
 # Import Pakete
 # import utils as u
 # import utils as u
-
+import os
 from datetime import datetime
 
 import pandas as pd
@@ -21,12 +21,17 @@ except ImportError:
 
 class Ko:
     def __init__(self, date):
+
         self.date = date
         self.date_dt = datetime.strptime(date, '%Y-%m-%d')
         self.schema_trg = 'biz'
         self.target = 'konto'
         self.schema_src = 'src'
         self.src_acct = 'acct'
+        if os.path.isdir(r'/Configs/ENB/'):
+            self.conf_r = r'/Configs/ENB/'
+        else:
+            self.conf_r = r'../Configs/ENB/'
 
 
     def join(self):
@@ -59,7 +64,7 @@ class Ko:
         print(colored('INFO: Entity ' + self.target, color='green'))
         con = connect_to_db(layer=self.schema_trg)
         sat_data = add_technical_col(data=data, t_name='s_konto', date=self.date, entity_name=self.target)
-        with open(r'../Configs/ENB/' + self.target + '.yaml') as file:
+        with open(self.conf_r + self.target + '.yaml') as file:
             documents = yaml.full_load(file)
         hub_target_fields = documents[self.target]['tables']['h_' + self.target]['fields']
         hub_target_fields.append(documents[self.target]['tables']['h_' + self.target]['hash_key'])

@@ -1,14 +1,21 @@
 import hashlib
+import os
 from datetime import datetime
 import pandas as pd
 import yaml
 from termcolor import colored
 import logging
 
-from utils.DataVaultLoader import DataVaultLoader
-from putils.TableReader import read_raw_sql_sat
-from utils.TechFields import add_technical_col
-from utils.db_connection import connect_to_db
+try:
+    from utils.DataVaultLoader import DataVaultLoader
+    from utils.TableReader import read_raw_sql_sat
+    from utils.TechFields import add_technical_col
+    from utils.db_connection import connect_to_db
+except ImportError:
+    from project.dags.utils.DataVaultLoader import DataVaultLoader
+    from project.dags.utils.TableReader import read_raw_sql_sat
+    from project.dags.utils.TechFields import add_technical_col
+    from project.dags.utils.db_connection import connect_to_db
 
 
 class Link_CC_Konto:
@@ -22,6 +29,10 @@ class Link_CC_Konto:
         self.src_trans = 'trans'
         self.src_disp = 'disposition'
         self.src_acct = 'acct'
+        if os.path.isdir(r'/Configs/ENB/'):
+            self.conf_r = r'/Configs/ENB/'
+        else:
+            self.conf_r = r'../Configs/ENB/'
 
     def join(self):
         card = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
@@ -79,7 +90,7 @@ class Link_CC_Konto:
         logging.info(colored('INFO: Entity ' + self.target, color='green'))
         con = connect_to_db(layer=self.schema_trg)
         sat_data = add_technical_col(data=data, t_name="l_m_cc_konto", date=self.date, entity_name=self.target)
-        with open(r'../Configs/ENB/' + self.target + '.yaml') as file:
+        with open(self.conf_r + self.target + '.yaml') as file:
             documents = yaml.full_load(file)
         hub_target_fields = documents[self.target]['tables']['l_cc_konto']['fields']
         hub_target_fields.append(documents[self.target]['tables']['l_cc_konto']['hash_key'])

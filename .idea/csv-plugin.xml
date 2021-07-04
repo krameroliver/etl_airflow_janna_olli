@@ -59,6 +59,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/project/dags/biz_beladung/lookup.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/project/dags/biz_beladung/test.py">
           <value>
             <Attribute>
