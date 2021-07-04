@@ -17,4 +17,4 @@ konto:
         - 'kontonummer'
       layer: 'biz'
       hash_key: 'konto_hk'
-      table_type: 'satellit'
+      table_type: 'hub'
