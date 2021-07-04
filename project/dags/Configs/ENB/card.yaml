@@ -1,15 +1,17 @@
 card:
-  fields:
-    - 'card_id'
-    - 'disp_id'
-    - 'card_type'
-    - 'year'
-    - 'month'
-    - 'day'
-    - 'fulldate'
-  businesskeys:
-    - 'card_id'
-  layer: 'src'
-  hash_key: 'card_hk'
-  table_type: 'satellit'
+  tables:
+    card:
+      fields:
+        - 'card_id'
+        - 'disp_id'
+        - 'card_type'
+        - 'year'
+        - 'month'
+        - 'day'
+        - 'fulldate'
+      businesskeys:
+        - 'card_id'
+      layer: 'src'
+      hash_key: 'card_hk'
+      table_type: 'satellit'
 

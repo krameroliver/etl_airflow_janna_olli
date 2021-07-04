@@ -1,17 +1,51 @@
 geschaeftspartner:
-  fields:
-    - 'kundennummer'
-    - 'anrede'
-    - 'vorname'
-    - 'nachname'
-    - 'geburtsdatum'
-    - 'sterbedatum'
-    - 'geschlecht'
-    - 'sozialversicherungsnummer'
-    - 'kreditkartenanzahl'
-    - 'loeschung'
-  businesskeys:
-    - 'kundennummer'
-  layer: 'biz'
-  hash_key: 'gp_hk'
-  table_type: 'satellit'
+  tables:
+    s_geschaeftspartner:
+      fields:
+        - 'kundennummer'
+        - 'anrede'
+        - 'vorname'
+        - 'nachname'
+        - 'geburtsdatum'
+        - 'sterbedatum'
+        - 'geschlecht'
+        - 'sozialversicherungsnummer'
+        - 'kreditkartenanzahl'
+        - 'loeschung'
+      businesskeys:
+        - 'kundennummer'
+      layer: 'biz'
+      hash_key: 'geschaeftspartner_hk'
+      table_type: 'satellit'
+    s_geschaeftspartner_postalische_addresse:
+      fields:
+        - 'kundennummer'
+        - 'addresse1'
+        - 'addresse2'
+        - 'stadt'
+        - 'bundesland'
+        - 'postleitzahl'
+      businesskeys:
+        - 'kundennummer'
+      layer: 'biz'
+      hash_key: 'geschaeftspartner_hk'
+      table_type: 'satellit'
+    m_geschaeftspartner_digitale_addresse:
+      fields:
+        - 'kundennummer'
+        - 'kontakttyp'
+        - 'kontaktinfo'
+      businesskeys:
+        - 'kundennummer'
+      layer: 'biz'
+      hash_key: 'geschaeftspartner_hk'
+      table_type: 'satellit'
+    h_geschaeftspartner:
+      fields:
+        - 'kundennummer'
+        - 'geschaeftspartner_hk'
+      businesskeys:
+        - 'kundennummer'
+      layer: 'biz'
+      hash_key: 'geschaeftspartner_hk'
+      table_type: 'hub'

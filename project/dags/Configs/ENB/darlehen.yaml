@@ -1,0 +1,27 @@
+darlehen:
+  tables:
+    s_darlehen:
+      fields:
+        - 'kontonummer'
+        - 'nominal'
+        - 'startdatum'
+        - 'enddatum'
+        - 'status'
+        - 'tilgung'
+        - 'verwendungszweck'
+        - 'futurecashflow'
+        - 'loeschung'
+      businesskeys:
+        - 'kontonummer'
+      layer: 'biz'
+      hash_key: 'darlehen_hk'
+      table_type: 'satellit'
+    h_darlehen:
+      fields:
+        - 'kontonummer'
+        - 'darlehen_hk'
+      businesskeys:
+        - 'kundennummer'
+      layer: 'biz'
+      hash_key: 'darlehen_hk'
+      table_type: 'hub'

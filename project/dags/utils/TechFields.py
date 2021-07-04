@@ -1,16 +1,30 @@
 import pandas as pd
 import yaml
 import hashlib
+import os
 
 
-def add_technical_col(data: pd.DataFrame,t_name:str,date:str=None):
+def add_technical_col(data: pd.DataFrame,t_name:str,date:str=None,entity_name:str=None):
 
+    if os.path.isfile(r'/Configs/ENB/{entity}.yaml'.format(entity=entity_name)):
+        conf = r'/Configs/ENB/{entity}.yaml'.format(entity=entity_name)
+    else:
+        conf = r'../Configs/ENB/{entity}.yaml'.format(entity=entity_name)
 
-
-    with open(r'/Configs/ENB/{entity}.yaml'.format(entity=t_name)) as file:
+    with open(conf) as file:
         documents = yaml.full_load(file)
-    data = data[documents['{entity}'.format(entity=t_name)]['fields']]
-    f = documents['{entity}'.format(entity=t_name)]['fields']
+
+    if entity_name == None:
+        entity = t_name
+    else:
+        entity = entity_name
+
+
+    data = data[documents[entity]['tables'][t_name]['fields']]
+    bkf = documents[entity]['tables'][t_name]['businesskeys']
+    hk_name = documents[entity]['tables'][t_name]['hash_key']
+#    else:
+#        pass
 
     data['diff_str'] = data.astype(str).agg('|'.join, axis=1)
     data["diff_hk"] = data['diff_str'].astype(str).apply(
@@ -22,14 +36,15 @@ def add_technical_col(data: pd.DataFrame,t_name:str,date:str=None):
     data['mod_flg'] = 'I'
 
     # hash-key berechnen
-    bkf = documents['{entity}'.format(entity=t_name)]['businesskeys']
-    business_fields = documents['{entity}'.format(entity=t_name)]['fields']
+
     if len(bkf) == 1:
-        data[t_name + "_hk"] = data[bkf[0]].astype(str).apply(
+        data[hk_name] = data[bkf[0]].astype(str).apply(
             lambda x: hashlib.md5(x.encode()).hexdigest().upper())
     else:
         data[t_name + '_str'] = data.astype(str).agg(''.join, axis=1)
-        data[t_name + "_hk"] = data[t_name + '_str'].astype(str).apply(
+        data[hk_name] = data[t_name + '_str'].astype(str).apply(
             lambda x: hashlib.md5(x.encode()).hexdigest().upper())
         data.drop(inplace=True, columns=t_name + '_str')
     return data
+
+

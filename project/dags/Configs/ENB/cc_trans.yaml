@@ -1,0 +1,23 @@
+cc_trans:
+  tables:
+    l_cc_trans:
+      fields:
+        - kreditkarte_hk
+        - transaktion_hk
+      businesskeys:
+        - kreditkarte_hk
+        - transaktion_hk
+      layer: 'biz'
+      hash_key: 'cc_trans_hk'
+      table_type: 'link'
+    l_m_cc_trans:
+      fields:
+        - transaktions_typ
+        - kreditkarte_hk
+        - transaktion_hk
+      businesskeys:
+        - kreditkarte_hk
+        - transaktion_hk
+      layer: 'biz'
+      hash_key: 'cc_trans_hk'
+      table_type: 'satellit'

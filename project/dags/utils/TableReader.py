@@ -7,7 +7,21 @@ import numpy as np
 from datetime import datetime, date
 
 
-def read_raw_sql(db_con, t_name: str, date: str, schema: str):
+def read_raw_sql_hub(db_con, t_name: str, date: str, schema: str):
+    metadata = MetaData(bind=db_con)
+    metadata.reflect(bind=db_con, schema=schema)
+
+    for table in [i for i in reversed(metadata.sorted_tables) if i.name == t_name]:
+        target_table = table
+    cols = target_table.columns
+    cols = [i.name.replace(t_name + ".", "") for i in cols]
+    data = db_con.execute(target_table.select()).fetchall()
+    df = pd.DataFrame(columns=cols, data=data)
+    df = df.reset_index()
+    return df
+
+
+def read_raw_sql_sat(db_con, t_name: str, date: str, schema: str):
     if date == None:
         processing_date_start = datetime.date.today().strftime("%Y-%m-%d")
     else:

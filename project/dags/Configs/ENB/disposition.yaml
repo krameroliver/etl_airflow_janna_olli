@@ -1,11 +1,13 @@
 disposition:
-  fields:
-    - 'disp_id'
-    - 'client_id'
-    - 'account_id'
-    - 'user_type'
-  businesskeys:
-    - 'disp_id'
-  layer: 'src'
-  hash_key: 'disposition_hk'
-  table_type: 'satellit'
+  tables:
+    disposition:
+      fields:
+        - 'disp_id'
+        - 'client_id'
+        - 'account_id'
+        - 'user_type'
+      businesskeys:
+        - 'disp_id'
+      layer: 'src'
+      hash_key: 'disposition_hk'
+      table_type: 'satellit'

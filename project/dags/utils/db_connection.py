@@ -2,11 +2,16 @@
 import yaml
 from sqlalchemy.engine import create_engine
 from sshtunnel import SSHTunnelForwarder
-
+import os.path
 
 def connect_to_db(layer:str=None):
 
-    with open(r'/Configs/Global/db.yaml') as file:
+    if os.path.isfile(r'/Configs/Global/db.yaml') :
+        config_file = r'/Configs/Global/db.yaml'
+    else:
+        config_file = r'../Configs/Global/db.yaml'
+
+    with open(config_file) as file:
         documents = yaml.full_load(file)
 
     user = documents['database']['user']

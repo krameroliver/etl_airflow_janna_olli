@@ -17,6 +17,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/project/dags/Configs/ENB/cc_trans.yaml">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/dags/biz_beladung/darlehen.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/project/dags/biz_beladung/geschaeftspartner.py">
           <value>
             <Attribute>
@@ -24,7 +38,49 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/project/dags/biz_beladung/l_cc_trans.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/dags/biz_beladung/l_gp_cc.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/dags/biz_beladung/test.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/dags/biz_darlehen_dag.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/project/dags/firstDAG.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/dags/read_entity_test.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/dags/source_beladung/source_load.py">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -42,6 +98,13 @@
           <value>
             <Attribute>
               <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/project/dags/utils/TechFields.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
             </Attribute>
           </value>
         </entry>

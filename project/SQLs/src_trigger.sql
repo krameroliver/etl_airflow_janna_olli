@@ -1,7 +1,3 @@
-USE src;
-
-
-
 DELIMITER $$
 $$
 CREATE OR REPLACE TRIGGER `delete_acct`
@@ -12,7 +8,7 @@ BEGIN
 	(account_id, district_id, frequency, parseddate, `year`, `month`, `day`, processing_date_start, processing_date_end, record_source, acct_hk, diff_hk, mod_flg)
 	VALUES(old.account_id, old.district_id, old.frequency, old.`parseddate`, old.`year`, old.`month`, old.`day`, old.processing_date_start, current_date(),old.record_source,old.acct_hk,old.diff_hk,'D');
 END$$
-
+--delim
 $$
 CREATE OR REPLACE TRIGGER `delete_district`
 BEFORE DELETE ON district
@@ -22,11 +18,7 @@ BEGIN
 	(district_id, city, state_name, state_abbrev, region, division, processing_date_start, processing_date_end, record_source, district_hk, diff_hk, mod_flg)
 	VALUES(old.district_id, old.city, old.state_name, old.state_abbrev, old.region, old.division, old.processing_date_start, current_date(),old.record_source,old.district_hk,old.diff_hk,'D');
 END$$
-
-
-
-
-
+--delim
 $$
 CREATE TRIGGER `delete_card`
 BEFORE DELETE ON card
@@ -37,9 +29,7 @@ BEGIN
 	VALUES(old.card_id, old.disp_id, old.card_type, old.`year`, old.`month`, old.`day`, old.fulldate, old.processing_date_start, current_date(),old.record_source,old.card_hk,old.diff_hk,'D');
 END
 $$
-
-
-
+--delim
 $$
 CREATE TRIGGER `delete_client`
 BEFORE DELETE ON client
@@ -51,8 +41,7 @@ VALUES(old.client_id, old.sex, old.fulldate, old.`day`, old.`month`, old.`year`,
 
 END
 $$
-
-
+--delim
 $$
 CREATE TRIGGER `delete_disposition`
 BEFORE DELETE ON disposition
@@ -64,8 +53,7 @@ VALUES(old.disp_id, old.client_id, old.account_id, old.user_type, old.processing
 
 END
 $$
-
-
+--delim
 $$
 CREATE TRIGGER `delete_loan`
 BEFORE DELETE ON loan
@@ -77,8 +65,7 @@ VALUES(old.loan_id, old.account_id, old.amount, old.duration, old.payments, old.
 
 END
 $$
-
-
+--delim
 $$
 CREATE TRIGGER `delete_order`
 BEFORE DELETE ON `order`
@@ -90,8 +77,7 @@ VALUES(old.order_id, old.account_id, old.bank_to, old.account_to, old.amount, ol
 
 END
 $$
-
-
+--delim
 $$
 CREATE TRIGGER `delete_trans`
 BEFORE DELETE ON trans
@@ -103,5 +89,5 @@ VALUES(old.run_id, old.trans_id, old.account_id, old.trans_type, old.operation, 
 
 END
 $$
-
+--delim
 DELIMITER ;

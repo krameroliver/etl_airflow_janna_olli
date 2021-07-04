@@ -9,7 +9,7 @@ CONSTRAINT r_link_cc_trans_cc UNIQUE (kreditkarte_hk)
 
 
 
-CREATE TABLE biz.r_link_darlehen_trans(
+CREATE TABLE biz.l_m_cc_trans(
 link_darlehen_trans_hk CHAR(32),
 darlehen_hk CHAR(32),
 transaktion_hk CHAR(32),

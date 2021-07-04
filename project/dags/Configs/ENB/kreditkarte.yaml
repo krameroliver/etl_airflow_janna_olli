@@ -1,0 +1,22 @@
+kreditkarte:
+  tables:
+    s_kreditkarte:
+      fields:
+        - 'kartennummer'
+        - 'beginndatum'
+        - 'kartentyp'
+        - 'loeschung'
+      businesskeys:
+        - 'kartennummer'
+      layer: 'biz'
+      hash_key: 'kreditkarte_hk'
+      table_type: 'satellit'
+    h_kreditkarte:
+      fields:
+        - 'kartennummer'
+        - 'kreditkarte_hk'
+      businesskeys:
+        - 'kartennummer'
+      layer: 'biz'
+      hash_key: 'kreditkarte_hk'
+      table_type: 'hub'

@@ -7,7 +7,8 @@ from source_beladung.source_load import read_write_source
 
 default_args={
         "owner":"airflow",
-        'start_date': datetime(2021,6,12)
+        'start_date': datetime(2021,6,12),
+        'concurrency':1
     }
 
 d = DAG(dag_id='load_all_source',
@@ -80,13 +81,13 @@ load_db_order = PythonOperator(
     dag=d
 )
 
-#load_db_trans = PythonOperator(
-#    task_id="load_trans",
-#    python_callable=read_write_source,
-#    provide_context=True,
-#    op_kwargs={'file': 'trans.csv', 'date': "2018-12-31", 'table': 'trans', 'header': 0, 'delm': ';'},
-#    dag=d
-#)
+load_db_trans = PythonOperator(
+    task_id="load_trans",
+    python_callable=read_write_source,
+    provide_context=True,
+    op_kwargs={'file': 'trans.csv', 'date': "2018-12-31", 'table': 'trans', 'header': 0, 'delm': ';'},
+    dag=d
+)
 
-startAllTasks >> [load_db_acct,load_db_card,load_db_client,load_db_order,load_db_loan,load_db_district,load_db_disposition] >> endTasks
+startAllTasks >> [load_db_acct,load_db_card,load_db_client,load_db_order,load_db_loan,load_db_district,load_db_disposition, load_db_trans] >> endTasks
 #startAllTasks >> load_db_acct >> endTasks

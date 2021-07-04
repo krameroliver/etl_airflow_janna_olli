@@ -1,14 +1,16 @@
 acct:
-  fields:
-    - 'account_id'
-    - 'district_id'
-    - 'frequency'
-    - 'parseddate'
-    - 'year'
-    - 'month'
-    - 'day'
-  businesskeys:
-    - 'account_id'
-  layer: 'src'
-  hash_key: 'acct_hk'
-  table_type: 'satellit'
+  tables:
+    acct:
+      fields:
+        - 'account_id'
+        - 'district_id'
+        - 'frequency'
+        - 'parseddate'
+        - 'year'
+        - 'month'
+        - 'day'
+      businesskeys:
+        - 'account_id'
+      layer: 'src'
+      hash_key: 'acct_hk'
+      table_type: 'satellit'

@@ -1,19 +1,21 @@
 loan:
-  fields:
-    - 'loan_id'
-    - 'account_id'
-    - 'amount'
-    - 'duration'
-    - 'payments'
-    - 'status'
-    - 'year'
-    - 'month'
-    - 'day'
-    - 'fulldate'
-    - 'location'
-    - 'purpose'
-  businesskeys:
-    - 'loan_id'
-  layer: 'src'
-  hash_key: 'loan_hk'
-  table_type: 'satellit'
+  tables:
+    loan:
+      fields:
+        - 'loan_id'
+        - 'account_id'
+        - 'amount'
+        - 'duration'
+        - 'payments'
+        - 'status'
+        - 'year'
+        - 'month'
+        - 'day'
+        - 'fulldate'
+        - 'location'
+        - 'purpose'
+      businesskeys:
+        - 'loan_id'
+      layer: 'src'
+      hash_key: 'loan_hk'
+      table_type: 'satellit'

@@ -11,15 +11,10 @@ def read_write_source(file ,date, table, delm, header):
     source_path = r"/rawdata/ENB/"
     source_path = os.path.join(source_path,date,file)
     data=pd.read_csv(source_path, delimiter=delm, header=header)
-    data = data.replace(np.nan, 'Null')
-    data = data.fillna('Null')
-    data=add_technical_col(data,table)
+    data.fillna(value="",inplace=True)
+    data=add_technical_col(data = data,t_name = table,date=date,entity_name = table)
 
     con = connect_to_db(layer="src")
-    dvl=DataVaultLoader(data,con,table,date,"src")
+    dvl=DataVaultLoader(data=data, t_name=table, date=date,db_con=con,entity_name=table ,schema='src',commit_size=1000)
     dvl.load
-    print(dvl)
 
-
-#read_write_source("card.csv","2018-12-31","card",",",0)
-#read_write_source("acct.csv","2018-12-31","acct",",",0)

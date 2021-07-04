@@ -1,0 +1,23 @@
+transaktion:
+  tables:
+    s_transaktion:
+      fields:
+        - 'transaktions_id'
+        - 'ausfuehrungsdatum'
+        - 'betrag'
+        - 'buchungsart'
+        - 'loeschung'
+      businesskeys:
+        - 'transaktions_id'
+      layer: 'biz'
+      hash_key: 'transaktion_hk'
+      table_type: 'satellit'
+    h_transaktion:
+      fields:
+        - 'transaktions_id'
+        - 'transaktion_hk'
+      businesskeys:
+        - 'transaktions_id'
+      layer: 'biz'
+      hash_key: 'transaktion_hk'
+      table_type: 'hub'
