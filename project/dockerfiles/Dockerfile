@@ -11,3 +11,4 @@ RUN pip install  sshtunnel
 RUN pip install marquez-python
 RUN pip install marquez-airflow
 RUN pip install pymysql
+RUN pip install sshtunnel

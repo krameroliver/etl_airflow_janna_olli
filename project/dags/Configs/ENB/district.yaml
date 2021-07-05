@@ -8,6 +8,13 @@ district:
         - 'state_abbrev'
         - 'region'
         - 'division'
+      data_types:
+        - 'Int64'
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
       businesskeys:
          - 'district_id'
       layer: 'src'

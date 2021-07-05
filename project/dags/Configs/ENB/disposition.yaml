@@ -6,6 +6,11 @@ disposition:
         - 'client_id'
         - 'account_id'
         - 'user_type'
+      data_types:
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'>
       businesskeys:
         - 'disp_id'
       layer: 'src'

@@ -8,6 +8,13 @@ order:
         - 'account_to'
         - 'amount'
         - 'k_symbol'
+      data_types:
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'Int64'
+        - 'float64'
+        - 'str'
       businesskeys:
         - 'order_id'
       layer: 'src'

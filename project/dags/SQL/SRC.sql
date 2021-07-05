@@ -1,4 +1,4 @@
-CREATE or replace TABLE acct(
+CREATE TABLE acct(
 account_id VARCHAR(11),
 district_id INTEGER,
 frequency VARCHAR(100),
@@ -147,6 +147,26 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(order_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
+
+CREATE TABLE district(
+district_id integer,
+city varchar(255),
+state_name  varchar(255),
+state_abbrev  varchar(255),
+region  varchar(255),
+division varchar(255),
+processing_date_start DATE DEFAULT NOW(),
+processing_date_end   DATE DEFAULT '2262-04-11',
+createte_at TIMESTAMP(6) AS ROW START INVISIBLE,
+modified_at TIMESTAMP(6) AS ROW END INVISIBLE,
+record_source varchar(255),
+district_hk CHAR(32),
+diff_hk CHAR(32),
+mod_flg CHAR(1),
+PERIOD FOR business_time(processing_date_start, processing_date_end),
+PERIOD FOR system_time(createte_at, modified_at),
+PRIMARY KEY(district_hk,processing_date_end)
+)
 
 CREATE TABLE trans(
 run_id varchar(100),

@@ -9,6 +9,14 @@ card:
         - 'month'
         - 'day'
         - 'fulldate'
+      data_types:
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'Int64'
+        - 'Int64'
+        - 'Int64'
+        - 'DATUM'
       businesskeys:
         - 'card_id'
       layer: 'src'

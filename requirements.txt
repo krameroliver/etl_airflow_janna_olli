@@ -14,3 +14,4 @@ stem
 PyYaml
 marquez-python
 marquez-airflow
+sshtunnel

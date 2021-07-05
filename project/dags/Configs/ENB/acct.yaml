@@ -9,6 +9,14 @@ acct:
         - 'year'
         - 'month'
         - 'day'
+      data_types:
+        - 'str'
+        - 'Int64'
+        - 'str'
+        - 'DATUM'
+        - 'Int64'
+        - 'Int64'
+        - 'Int64'
       businesskeys:
         - 'account_id'
       layer: 'src'
