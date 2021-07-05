@@ -139,3 +139,5 @@ dmypy.json
 cython_debug/
 project/logs/scheduler/latest
 project/logs/scheduler/latest
+.idea/csv-plugin.xml
+project/logs/scheduler/latest
