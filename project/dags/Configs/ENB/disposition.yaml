@@ -10,7 +10,7 @@ disposition:
         - 'str'
         - 'str'
         - 'str'
-        - 'str'>
+        - 'str'
       businesskeys:
         - 'disp_id'
       layer: 'src'

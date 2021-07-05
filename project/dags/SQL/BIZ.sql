@@ -60,7 +60,8 @@ PRIMARY KEY(konto_hk));
 CREATE TABLE biz.s_konto(
 kontonummer VARCHAR(18),
 frequenz INTEGER,
-wertstellungstag DATE,
+wertstellungszeitpunkt timestamp,
+kontoerstellung_dt date,
 processing_date_start DATE DEFAULT NOW(),
 processing_date_end   DATE DEFAULT '2262-04-11',
 createte_at TIMESTAMP(6) AS ROW START INVISIBLE,

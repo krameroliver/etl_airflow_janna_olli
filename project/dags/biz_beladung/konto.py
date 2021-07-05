@@ -42,17 +42,17 @@ class Ko:
                                   t_name=self.src_trans)
         trans=trans[['account_id','balance','fulldatewithtime']]
 
-        trans['fulldatewithtime']=trans['fulldatewithtime'].apply(lambda x: self.timestamp(x))
+        #trans['fulldatewithtime']=trans['fulldatewithtime'].apply(lambda x: self.timestamp(x))
 
         max_ids=trans.groupby(['account_id'])['fulldatewithtime'].transform(max)==trans['fulldatewithtime']
         trans=trans[max_ids]
 
-        print(trans.head)
+        #print(trans.head)
 
 
-        #data = account.merge(trans,  how='inner', left_on=['account_id'], right_on=['account_id'])
+        data = account.merge(trans,  how='inner', left_on=['account_id'], right_on=['account_id'])
 
-        #return data
+        return data
 
     def timestamp(self, ts):
         ts=ts.replace('T',' ')
@@ -73,8 +73,9 @@ class Ko:
         out_data = pd.DataFrame()
         out_data['kontonummer'] = data['account_id']
         out_data['frequenz'] = data['frequency'].apply(lambda x: self.lkp_frequenz(x))
-        out_data['wertstellungstag'] = data['parseddate']
-        out_data['kontostand']=data['balance']
+        out_data['kontoerstellung_dt'] = data['parseddate']
+        out_data['wertstellungszeitpunkt'] = data['fulldatewithtime']
+        out_data['kontostand'] = data['balance']
 
         return out_data
 
@@ -99,9 +100,9 @@ class Ko:
         print('--- Beladung Ende ---\n')
 
 
-konto=Ko('2018-12-31')
-join=konto.join()
+#konto=Ko('2018-12-31')
+#join=konto.join()
 #map=konto.mapping(join)
-print(join)
+#konto.writeToDB(map)
 
 

@@ -85,7 +85,7 @@ load_db_trans = PythonOperator(
     task_id="load_trans",
     python_callable=read_write_source,
     provide_context=True,
-    op_kwargs={'file': 'trans.csv', 'date': "2018-12-31", 'table': 'trans', 'header': 0, 'delm': ';'},
+    op_kwargs={'file': 'trans.csv', 'date': "2018-12-31", 'table': 'trans', 'header': 0, 'delm': ','},
     dag=d
 )
 

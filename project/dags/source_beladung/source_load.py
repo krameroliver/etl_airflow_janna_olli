@@ -68,4 +68,4 @@ def read_write_source(file, date, table, delm, header):
     dvl.load
 
 
-read_write_source('acct.csv', '2018-12-31', 'acct', ',', 0)
+#read_write_source('acct.csv', '2018-12-31', 'acct', ',', 0)

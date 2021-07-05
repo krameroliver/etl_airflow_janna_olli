@@ -29,7 +29,7 @@ trans:
         - 'float64'
         - 'str'
         - 'str'
-        - 'Int64'
+        - 'str'
         - 'Int64'
         - 'Int64'
         - 'Int64'
