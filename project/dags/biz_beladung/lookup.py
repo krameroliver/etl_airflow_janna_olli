@@ -1,7 +1,6 @@
-import hashlib
-from datetime import datetime
-import pandas as pd
 import logging
+
+import pandas as pd
 
 try:
     from utils.db_connection import connect_to_db
@@ -10,8 +9,8 @@ except ImportError:
 
 
 class lookup:
-    def __init__(self,lkp_name:str,lkp_data:dict):
-        self.lkp_name = 'lkp_'+lkp_name
+    def __init__(self, lkp_name: str, lkp_data: dict):
+        self.lkp_name = lkp_name
         self.lkp_data = pd.DataFrame(data=lkp_data)
 
     def __repr__(self):
@@ -20,9 +19,7 @@ class lookup:
 
     @property
     def get_lkp(self):
-        return (self.lkp_name,self.lkp_data)
-
-
+        return (self.lkp_name, self.lkp_data)
 
 
 class LookUps:
@@ -35,13 +32,13 @@ class LookUps:
         con = connect_to_db(self.schema_trg)
 
         logging.info('WRITE STATUS')
-        lkp = lookup('STATUS',{'auspraegung':['A','B','C','D'],'ID':[1,2,3,4]}).get_lkp
-        lkp[1].to_sql(schema=self.schema_trg,con=con,if_exists='replace',name=lkp[0],index=False)
+        lkp = lookup('STATUS', {'auspraegung': ['A', 'B', 'C', 'D'], 'ID': [1, 2, 3, 4]}).get_lkp
+        lkp[1].to_sql(schema=self.schema_trg, con=con, if_exists='replace', name=lkp[0], index=False)
         logging.info('WRITE USER_TYPE')
         lkp = lookup('USER_TYPE', {'auspraegung': ['User', 'Owner', ''], 'ID': [1, 0, 99]}).get_lkp
         lkp[1].to_sql(schema=self.schema_trg, con=con, if_exists='replace', name=lkp[0], index=False)
         logging.info('WRITE DURCHSCHNITTSALTER')
-        lkp = lookup('DURCHSCHNITTSALTER', {'auspraegung': ['Female', 'Male', 'Div'], 'ID': [84,79, 82]}).get_lkp
+        lkp = lookup('DURCHSCHNITTSALTER', {'auspraegung': ['Female', 'Male', 'Div'], 'ID': [84, 79, 82]}).get_lkp
         lkp[1].to_sql(schema=self.schema_trg, con=con, if_exists='replace', name=lkp[0], index=False)
         logging.info('WRITE SEX')
         lkp = lookup('SEX', {'auspraegung': ['Female', 'Male', 'Div'], 'ID': [0, 1, 2]}).get_lkp
@@ -50,7 +47,20 @@ class LookUps:
         lkp = lookup('ANREDE', {'auspraegung': ['Female', 'Male', 'Div'], 'ID': ['Frau', 'Herr', 'Mensch']}).get_lkp
         lkp[1].to_sql(schema=self.schema_trg, con=con, if_exists='replace', name=lkp[0], index=False)
         logging.info('WRITE CARTTYPE')
-        lkp = lookup('CARTTYPE', {'auspraegung': ['VISA Signature', 'VISA Standard', 'VISA Infinite'], 'ID': [0,1,2]}).get_lkp
+        lkp = lookup('CARTTYPE',
+                     {'auspraegung': ['VISA Signature', 'VISA Standard', 'VISA Infinite'], 'ID': [0, 1, 2]}).get_lkp
+        lkp[1].to_sql(schema=self.schema_trg, con=con, if_exists='replace', name=lkp[0], index=False)
+
+        lkp = lookup('cf_opperation'.upper(), {
+            'auspraegung': ['Credit in Cash', 'Cash Withdrawal', 'Remittance to Another Bank',
+                            'Collection from Another Bank', 'Credit Card Withdrawal', 'Order', ''],
+            'ID': [0, 1, 2, 3, 4, 5, 99]}).get_lkp
+        lkp[1].to_sql(schema=self.schema_trg, con=con, if_exists='replace', name=lkp[0], index=False)
+
+        lkp = lookup('payment_type'.upper(), {
+            'auspraegung': ['Household Payment', 'Loan Payment', 'Leasing Payment',
+                            'Insurance Payment', 'Payment on Statement','Interest Credited','Household','Old Age Pension','Sanction Interest', ''],
+            'ID': [0, 1, 2, 3,4,5,6,7,8, 99]}).get_lkp
         lkp[1].to_sql(schema=self.schema_trg, con=con, if_exists='replace', name=lkp[0], index=False)
 
 

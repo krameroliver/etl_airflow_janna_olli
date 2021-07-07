@@ -7,6 +7,8 @@ transaktion:
         - 'betrag'
         - 'buchungsart'
         - 'loeschung'
+        - 'operation'
+        - 'payment_type'
       businesskeys:
         - 'transaktions_id'
       layer: 'biz'

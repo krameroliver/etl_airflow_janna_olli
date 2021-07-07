@@ -37,8 +37,8 @@ def read_write_source(file, date, table, delm, header):
         conf_r = r'/Configs/ENB/'
         source_path = r'/rawdata/ENB/'
     else:
-        conf_r = get_os_pathes()[0]
-        source_path = get_os_pathes()[1]
+        conf_r = r'../Configs/ENB/'
+        source_path = r'../../rawdata/ENB/'
 
     print(os.path.abspath(os.getcwd()))
     p = os.path.join(conf_r, table + '.yaml').replace(r"\\\\",r"/")
@@ -64,8 +64,8 @@ def read_write_source(file, date, table, delm, header):
 
     con = connect_to_db(layer=layer)
     dvl = DataVaultLoader(data=data, t_name=table, date=date, db_con=con, entity_name=table, schema=layer,
-                          commit_size=1000)
+                          commit_size=10000)
     dvl.load
 
 
-#read_write_source('acct.csv', '2018-12-31', 'acct', ',', 0)
+read_write_source('trans.csv', '2018-12-31', 'trans', ',', 0)

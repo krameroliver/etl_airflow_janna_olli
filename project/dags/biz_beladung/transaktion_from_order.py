@@ -4,7 +4,6 @@ from datetime import datetime
 import pandas as pd
 import yaml
 from termcolor2 import colored
-
 try:
     from utils.DataVaultLoader import DataVaultLoader
     from utils.TableReader import read_raw_sql_sat
@@ -26,20 +25,18 @@ class Transaktion:
         self.schema_trg = 'biz'
         self.target = 'transaktion'
         self.schema_src = 'src'
-        self.src_trans = 'trans'
+        self.src_order = 'order'
         if os.path.isdir(r'/Configs/ENB/'):
             self.conf_r = r'/Configs/ENB/'
         else:
             self.conf_r = r'../Configs/ENB/'
-        self.db_com_src = connect_to_db(layer=self.schema_src)
-        self.db_com_trg = connect_to_db(layer=self.schema_trg)
 
     def join(self):
-        trans = read_raw_sql_sat(db_con=self.db_com_src, date=self.date, schema=self.schema_src,
-                                 t_name=self.src_trans)
-        with open(self.conf_r + self.src_trans + '.yaml') as file:
+        trans = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
+                                 t_name=self.src_order)
+        with open(self.conf_r + self.src_order + '.yaml') as file:
             documents = yaml.full_load(file)
-        field_list = documents[self.src_trans]['tables'][self.src_trans]['fields']
+        field_list = documents[self.src_order]['tables'][self.src_order]['fields']
         trans = trans[field_list]
         return trans
 
@@ -49,23 +46,14 @@ class Transaktion:
         sat_target_fields = documents[self.target]['tables']['s_' + self.target]['fields']
         sat_res_data = pd.DataFrame(columns=sat_target_fields)
 
-        sat_res_data['transaktions_id'] = data['trans_id']
-        sat_res_data['ausfuehrungsdatum'] = data['fulldate']
-        sat_res_data['betrag'] = data['amount']
+        sat_res_data['transaktions_id'] = data['order_id']
+        #sat_res_data['ausfuehrungsdatum'] = data['fulldate'].apply(lambda x: datetime.strptime(x,'%d.%m.%Y').date())
+        sat_res_data['betrag'] = data['amount'].apply(lambda x: float(x.replace(',','.')))
         sat_res_data['loeschung'] = 10
-        sat_res_data['buchungsart'] = 1
-
-        lkp_cf_opperation = get_lkp_value(lkp_name='cf_opperation')
-        lkp_payment_type = get_lkp_value( lkp_name='payment_type')
-
-        sat_res_data['operation'] = data['operation'].apply(
-            lambda x: lkp_cf_opperation[x])
-        sat_res_data['payment_type'] = data['k_symbol'].apply(
-            lambda x: lkp_payment_type[x])
+        sat_res_data['buchungsart'] = 2
+        sat_res_data['operation'] = 5
+        sat_res_data['payment_type'] = data['k_symbol'].apply(lambda x: get_lkp_value(lkp_name='payment_type',lkp_value=x )  )
         return sat_res_data
-
-
-
 
     def writeToDB(self, data: pd.DataFrame):
         print(colored('INFO: Entity ' + self.target, color='green'))
@@ -84,7 +72,3 @@ class Transaktion:
         dv_sat.load
         dv_hub.load
         print('--- Beladung Ende ---\n')
-
-
-enttity = Transaktion('2018-12-31')
-enttity.writeToDB(enttity.mapping(enttity.join()))

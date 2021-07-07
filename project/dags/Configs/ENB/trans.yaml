@@ -34,7 +34,7 @@ trans:
         - 'Int64'
         - 'Int64'
         - 'DATUM'
-        - 'DATUM'
+        - 'str'
         - 'DATUM'
         - 'DATUM'
       businesskeys:
