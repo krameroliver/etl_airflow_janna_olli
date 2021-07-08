@@ -1,22 +1,22 @@
-gp_cc:
+gp_darlehen:
   tables:
-    l_gp_cc:
+    l_gp_darlehen:
       fields:
-        - kreditkarte_hk
+        - darlehen_hk
         - geschaeftspartner_hk
       businesskeys:
-        - kreditkarte_hk
+        - darlehen_hk
         - geschaeftspartner_hk
       layer: 'biz'
-      hash_key: 'gp_cc_hk'
+      hash_key: 'gp_darlehen_hk'
       table_type: 'link'
-    l_m_gp_cc:
+    l_s_gp_darlehen:
       fields:
-        - kreditkarte_hk
+        - darlehen_hk
         - geschaeftspartner_hk
       businesskeys:
-        - kreditkarte_hk
+        - darlehen_hk
         - geschaeftspartner_hk
       layer: 'biz'
-      hash_key: 'gp_cc_hk'
+      hash_key: 'gp_darlehen_hk'
       table_type: 'satellit'

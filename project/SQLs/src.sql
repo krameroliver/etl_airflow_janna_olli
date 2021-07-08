@@ -16,7 +16,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(acct_hk)
+PRIMARY KEY(acct_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE or replace TABLE acct_hist(
@@ -37,7 +37,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(acct_hk)
+PRIMARY KEY(acct_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 create or replace TABLE district(
@@ -57,7 +57,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(district_hk)
+PRIMARY KEY(district_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 create or replace TABLE district_hist(
@@ -77,7 +77,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(district_hk)
+PRIMARY KEY(district_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE card(
@@ -98,7 +98,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(card_hk)
+PRIMARY KEY(card_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE card_hist(
@@ -119,7 +119,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(card_hk)
+PRIMARY KEY(card_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE client(
@@ -152,7 +152,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(client_hk)
+PRIMARY KEY(client_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE client_hist(
@@ -185,7 +185,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(client_hk)
+PRIMARY KEY(client_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE disposition(
@@ -203,7 +203,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(disposition_hk)
+PRIMARY KEY(disposition_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE disposition_hist(
@@ -221,7 +221,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(disposition_hk)
+PRIMARY KEY(disposition_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE loan(
@@ -247,7 +247,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(loan_hk)
+PRIMARY KEY(loan_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE loan_hist(
@@ -273,7 +273,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(loan_hk)
+PRIMARY KEY(loan_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE `order`(
@@ -293,7 +293,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(order_hk)
+PRIMARY KEY(order_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE `order_hist`(
@@ -313,7 +313,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(order_hk)
+PRIMARY KEY(order_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE trans(
@@ -344,7 +344,7 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(trans_hk)
+PRIMARY KEY(trans_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 --delim
 CREATE TABLE trans_hist(
@@ -375,5 +375,5 @@ diff_hk CHAR(32),
 mod_flg CHAR(1),
 PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
-PRIMARY KEY(trans_hk)
+PRIMARY KEY(trans_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;

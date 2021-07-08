@@ -36,59 +36,52 @@ def load(**kwargs):
     print(data_to_db)
     ko.writeToDB(data_to_db)
 
+def load_subdag(parent_dag_name, child_dag_name, args):
+    d = DAG(dag_id='{0}.{1}'.format(parent_dag_name,child_dag_name),
+            schedule_interval="@daily",
+            default_args=args,
+            catchup=False)
 
-d = DAG(dag_id='load_ko_biz',
-        schedule_interval="@daily",
-        default_args=default_args,
-        catchup=False)
+    startAllTasks = BashOperator(
+        task_id='start',
+        bash_command='echo "Start All Tasks"',
+        dag=d
+    )
 
-src_dependency = ExternalTaskSensor(
-    task_id='src_dag_completed_status',
-    external_dag_id='load_all_source',
-    external_task_id='end',  # wait for whole DAG to complete
-    check_existence=True,
-    start_date=datetime(2021, 6, 12))
-
-startAllTasks = BashOperator(
-    task_id='start',
-    bash_command='echo "Start All Tasks"',
-    dag=d
-)
-
-endTasks = BashOperator(
-    task_id='end',
-    bash_command='echo "All Tasks Finished"',
-    dag=d
-)
+    endTasks = BashOperator(
+        task_id='end',
+        bash_command='echo "All Tasks Finished"',
+        dag=d
+    )
 
 
 
-ko_join = PythonOperator(
-    task_id="ko_join",
-    python_callable=join,
-    provide_context=True,
-    #op_kwargs={},
-    dag=d
-)
+    ko_join = PythonOperator(
+        task_id="ko_join",
+        python_callable=join,
+        provide_context=True,
+        #op_kwargs={},
+        dag=d
+    )
 
-################################
-ko_map = PythonOperator(
-    task_id="ko_map",
-    python_callable=mapping,
-    provide_context=True,
-    #op_kwargs={},
-    dag=d
-)
+    ################################
+    ko_map = PythonOperator(
+        task_id="ko_map",
+        python_callable=mapping,
+        provide_context=True,
+        #op_kwargs={},
+        dag=d
+    )
 
-ko_load = PythonOperator(
-   task_id="ko_load",
-   python_callable=load,
-   provide_context=True,
-   #op_kwargs={},
-   dag=d
-)
-################################
+    ko_load = PythonOperator(
+       task_id="ko_load",
+       python_callable=load,
+       provide_context=True,
+       #op_kwargs={},
+       dag=d
+    )
+    ################################
 
 
-src_dependency >> startAllTasks >> ko_join >> ko_map >> ko_load >> endTasks
-#startAllTasks >> load_db_acct >> endTasks
+    startAllTasks >> ko_join >> ko_map >> ko_load >> endTasks
+    return d

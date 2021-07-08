@@ -4,77 +4,71 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.subdag_operator import  SubDagOperator
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from datetime import timedelta, datetime
-
-#try:
 from airflow.sensors.external_task import ExternalTaskSensor
 
-from biz_beladung.kreditkarte import Kreditkarte
+from biz_beladung.l_darlehen_konto import Link_DARLEHEN_KONTO
 
 default_args={
         "owner":"airflow",
         'start_date': datetime(2021,6,12)
     }
 
-
-kreditkarte = Kreditkarte("2018-12-31")
-
-
+link = Link_DARLEHEN_KONTO('2018-12-31')
 def join(**kwargs):
-    data=kreditkarte.join()
+    data=link.join()
     return data
 
 def mapping(**kwargs):
     ti=kwargs['ti']
     data = ti.xcom_pull(key='return_value')
-    map=kreditkarte.mapping(data=data)
-    ti.xcom_push(key='kreditkarte_map_data', value=map)
+    map=link.mapping(data=data)
+    ti.xcom_push(key='link_map_data', value=map)
 
 def load(**kwargs):
     ti=kwargs['ti']
-    data_to_db = ti.xcom_pull(key='kreditkarte_map_data')
+    data_to_db = ti.xcom_pull(key='link_map_data')
     print(data_to_db)
-    kreditkarte.writeToDB(data_to_db)
-
+    link.writeToDB(data_to_db)
 
 
 def load_subdag(parent_dag_name, child_dag_name, args):
-    d = DAG(dag_id='{0}.{1}'.format(parent_dag_name,child_dag_name),
+    d = DAG(dag_id='{0}.{1}'.format(parent_dag_name, child_dag_name),
             schedule_interval="@daily",
             default_args=args,
             catchup=False)
 
     startAllTasks = BashOperator(
         task_id='start',
-        bash_command='echo "Start kreditkarte Tasks"',
+        bash_command='echo "Start All Tasks"',
         dag=d
     )
 
     endTasks = BashOperator(
         task_id='end',
-        bash_command='echo "kreditkarte Tasks Finished"',
+        bash_command='echo "All Tasks Finished"',
         dag=d
     )
 
 
 
-    kreditkarte_join = PythonOperator(
-        task_id="kreditkarte_join",
+    link_darlehen_konto_join = PythonOperator(
+        task_id="link_darlehen_konto_join",
         python_callable=join,
         provide_context=True,
         #op_kwargs={},
         dag=d
     )
 
-    kreditkarte_map = PythonOperator(
-        task_id="kreditkarte_map",
+    link_darlehen_konto_map = PythonOperator(
+        task_id="link_darlehen_konto_map",
         python_callable=mapping,
         provide_context=True,
         #op_kwargs={},
         dag=d
     )
 
-    kreditkarte_load = PythonOperator(
-       task_id="kreditkarte_load",
+    link_darlehen_konto_load = PythonOperator(
+       task_id="link_darlehen_konto_load",
        python_callable=load,
        provide_context=True,
        #op_kwargs={},
@@ -82,5 +76,5 @@ def load_subdag(parent_dag_name, child_dag_name, args):
     )
 
 
-    startAllTasks >> kreditkarte_join >> kreditkarte_map >>kreditkarte_load >> endTasks
+    startAllTasks >> link_darlehen_konto_join >> link_darlehen_konto_map >> link_darlehen_konto_load >> endTasks
     return d

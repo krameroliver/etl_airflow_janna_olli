@@ -1,0 +1,23 @@
+trans_konto:
+  tables:
+    l_trans_konto:
+      fields:
+        - transaktion_hk
+        - konto_hk
+      businesskeys:
+        - transaktion_hk
+        - konto_hk
+      layer: 'biz'
+      hash_key: 'trans_konto_hk'
+      table_type: 'link'
+    l_s_trans_konto:
+      fields:
+        - transaktion_hk
+        - konto_hk
+        - trans_type
+      businesskeys:
+        - transaktion_hk
+        - konto_hk
+      layer: 'biz'
+      hash_key: 'trans_konto_hk'
+      table_type: 'satellit'

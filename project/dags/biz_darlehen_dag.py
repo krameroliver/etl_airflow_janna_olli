@@ -12,6 +12,9 @@ from biz_beladung.darlehen import Darlehen
 #except ImportError:
 #    from project.dags.biz_beladung.geschaeftspartner import Gp
 
+
+
+
 default_args={
         "owner":"airflow",
         'start_date': datetime(2021,6,12)
@@ -39,57 +42,52 @@ def load(**kwargs):
     print(data_to_db)
     darlehen.writeToDB(data_to_db)
 
+def load_subdag(parent_dag_name, child_dag_name, args):
+    d = DAG(dag_id='{0}.{1}'.format(parent_dag_name,child_dag_name),
+            schedule_interval="@daily",
+            default_args=args,
+            catchup=False)
 
 
-d = DAG(dag_id='load_darlehen_biz',
-        schedule_interval="@daily",
-        default_args=default_args,
-        catchup=False)
+    startAllTasks = BashOperator(
+        task_id='start',
+        bash_command='echo "Start darlehen Tasks"',
+        dag=d
+    )
 
-src_dependency = ExternalTaskSensor(
-    task_id='src_dag_completed_status',
-    external_dag_id='load_all_source',
-    external_task_id='end',  # wait for whole DAG to complete
-    check_existence=True,
-    start_date=datetime(2021, 6, 12))
-
-startAllTasks = BashOperator(
-    task_id='start',
-    bash_command='echo "Start darlehen Tasks"',
-    dag=d
-)
-
-endTasks = BashOperator(
-    task_id='end',
-    bash_command='echo "darlehen Tasks Finished"',
-    dag=d
-)
+    endTasks = BashOperator(
+        task_id='end',
+        bash_command='echo "darlehen Tasks Finished"',
+        dag=d
+    )
 
 
 
-darlehen_join = PythonOperator(
-    task_id="darlehen_join",
-    python_callable=join,
-    provide_context=True,
-    #op_kwargs={},
-    dag=d
-)
+    darlehen_join = PythonOperator(
+        task_id="darlehen_join",
+        python_callable=join,
+        provide_context=True,
+        #op_kwargs={},
+        dag=d
+    )
 
-darlehen_map = PythonOperator(
-    task_id="darlehen_map",
-    python_callable=mapping,
-    provide_context=True,
-    #op_kwargs={},
-    dag=d
-)
+    darlehen_map = PythonOperator(
+        task_id="darlehen_map",
+        python_callable=mapping,
+        provide_context=True,
+        #op_kwargs={},
+        dag=d
+    )
 
-darlehen_load = PythonOperator(
-   task_id="darlehen_load",
-   python_callable=load,
-   provide_context=True,
-   #op_kwargs={},
-   dag=d
-)
+    darlehen_load = PythonOperator(
+       task_id="darlehen_load",
+       python_callable=load,
+       provide_context=True,
+       #op_kwargs={},
+       dag=d
+    )
 
 
-src_dependency >> startAllTasks >> darlehen_join >> darlehen_map >> darlehen_load >> endTasks
+    startAllTasks >> darlehen_join >> darlehen_map >> darlehen_load >> endTasks
+
+    return d

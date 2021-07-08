@@ -1,22 +1,23 @@
-gp_cc:
+gp_konto:
   tables:
-    l_gp_cc:
+    l_gp_konto:
       fields:
-        - kreditkarte_hk
         - geschaeftspartner_hk
+        - konto_hk
       businesskeys:
-        - kreditkarte_hk
         - geschaeftspartner_hk
+        - konto_hk
       layer: 'biz'
-      hash_key: 'gp_cc_hk'
+      hash_key: 'gp_konto_hk'
       table_type: 'link'
-    l_m_gp_cc:
+    l_m_gp_konto:
       fields:
-        - kreditkarte_hk
+        - gp_rolle
         - geschaeftspartner_hk
+        - konto_hk
       businesskeys:
-        - kreditkarte_hk
         - geschaeftspartner_hk
+        - konto_hk
       layer: 'biz'
-      hash_key: 'gp_cc_hk'
+      hash_key: 'gp_konto_hk'
       table_type: 'satellit'

@@ -86,5 +86,3 @@ class Transaktion:
         print('--- Beladung Ende ---\n')
 
 
-enttity = Transaktion('2018-12-31')
-enttity.writeToDB(enttity.mapping(enttity.join()))

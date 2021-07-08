@@ -23,7 +23,7 @@ print(parse_list)
 
 
 data=pd.read_csv(r'../../rawdata/ENB/2018-12-31/trans.csv', delimiter=',',header=0, dtype=rel_types,parse_dates=parse_list,infer_datetime_format=True)
-#data['date'] = pd.to_datetime(data['date'],infer_datetime_format='%Y-%m-%d')
+
 
 
 print(data[['fulldate', 'fulltime', 'fulldatewithtime', 'date']])

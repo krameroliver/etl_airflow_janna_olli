@@ -66,6 +66,3 @@ def read_write_source(file, date, table, delm, header):
     dvl = DataVaultLoader(data=data, t_name=table, date=date, db_con=con, entity_name=table, schema=layer,
                           commit_size=10000)
     dvl.load
-
-
-read_write_source('trans.csv', '2018-12-31', 'trans', ',', 0)

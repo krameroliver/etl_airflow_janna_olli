@@ -1,0 +1,22 @@
+darlehen_konto:
+  tables:
+    l_darlehen_konto:
+      fields:
+        - darlehen_hk
+        - konto_hk
+      businesskeys:
+        - darlehen_hk
+        - konto_hk
+      layer: 'biz'
+      hash_key: 'darlehen_konto_hk'
+      table_type: 'link'
+    l_s_darlehen_konto:
+      fields:
+        - darlehen_hk
+        - konto_hk
+      businesskeys:
+        - darlehen_hk
+        - konto_hk
+      layer: 'biz'
+      hash_key: 'darlehen_konto_hk'
+      table_type: 'satellit'

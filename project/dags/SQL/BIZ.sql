@@ -1,3 +1,106 @@
+CREATE TABLE biz.l_gp_darlehen(
+gp_darlehen_hk CHAR(32),
+geschaeftspartner_hk CHAR(32),
+darlehen_hk CHAR(32),
+PRIMARY KEY(gp_darlehen_hk)
+);
+
+CREATE TABLE biz.l_s_gp_darlehen(
+gp_darlehen_hk CHAR(32),
+geschaeftspartner_hk CHAR(32) INVISIBLE,
+darlehen_hk CHAR(32) INVISIBLE,
+processing_date_start DATE DEFAULT NOW(),
+processing_date_end   DATE DEFAULT '2262-04-11',
+createte_at TIMESTAMP(6) AS ROW START INVISIBLE,
+modified_at TIMESTAMP(6) AS ROW END INVISIBLE,
+record_source varchar(255),
+diff_hk CHAR(32),
+mod_flg CHAR(1),
+PERIOD FOR business_time(processing_date_start, processing_date_end),
+PERIOD FOR system_time(createte_at, modified_at),
+PRIMARY KEY(gp_darlehen_hk,processing_date_end)
+)WITH SYSTEM VERSIONING;
+
+---------------------------------
+
+CREATE TABLE biz.l_trans_konto(
+trans_konto_hk CHAR(32),
+konto_hk CHAR(32),
+darlehen_hk CHAR(32),
+PRIMARY KEY(trans_konto_hk)
+);
+
+CREATE TABLE biz.l_s_trans_konto(
+trans_konto_hk CHAR(32),
+konto_hk CHAR(32) INVISIBLE,
+transaktion_hk CHAR(32) INVISIBLE,
+trans_type INTEGER,
+processing_date_start DATE DEFAULT NOW(),
+processing_date_end   DATE DEFAULT '2262-04-11',
+createte_at TIMESTAMP(6) AS ROW START INVISIBLE,
+modified_at TIMESTAMP(6) AS ROW END INVISIBLE,
+record_source varchar(255),
+diff_hk CHAR(32),
+mod_flg CHAR(1),
+PERIOD FOR business_time(processing_date_start, processing_date_end),
+PERIOD FOR system_time(createte_at, modified_at),
+PRIMARY KEY(trans_konto_hk,processing_date_end)
+)WITH SYSTEM VERSIONING;
+
+---------------------------------
+
+CREATE TABLE biz.l_darlehen_konto(
+darlehen_konto_hk CHAR(32),
+konto_hk CHAR(32),
+transaktion_hk CHAR(32),
+PRIMARY KEY(darlehen_konto_hk)
+);
+
+CREATE TABLE biz.l_s_darlehen_konto(
+darlehen_konto_hk CHAR(32),
+konto_hk CHAR(32) INVISIBLE,
+darlehen_hk CHAR(32) INVISIBLE,
+processing_date_start DATE DEFAULT NOW(),
+processing_date_end   DATE DEFAULT '2262-04-11',
+createte_at TIMESTAMP(6) AS ROW START INVISIBLE,
+modified_at TIMESTAMP(6) AS ROW END INVISIBLE,
+record_source varchar(255),
+diff_hk CHAR(32),
+mod_flg CHAR(1),
+PERIOD FOR business_time(processing_date_start, processing_date_end),
+PERIOD FOR system_time(createte_at, modified_at),
+PRIMARY KEY(darlehen_konto_hk,processing_date_end)
+)WITH SYSTEM VERSIONING;
+
+---------------------------------
+
+
+CREATE TABLE biz.l_gp_konto(
+gp_konto_hk CHAR(32),
+konto_hk CHAR(32),
+geschaeftspartner_hk CHAR(32),
+PRIMARY KEY(gp_konto_hk)
+);
+
+CREATE TABLE biz.l_m_gp_konto(
+gp_konto_hk CHAR(32),
+konto_hk CHAR(32) INVISIBLE,
+geschaeftspartner_hk CHAR(32) INVISIBLE,
+gp_rolle INTEGER,
+processing_date_start DATE DEFAULT NOW(),
+processing_date_end   DATE DEFAULT '2262-04-11',
+createte_at TIMESTAMP(6) AS ROW START INVISIBLE,
+modified_at TIMESTAMP(6) AS ROW END INVISIBLE,
+record_source varchar(255),
+diff_hk CHAR(32),
+mod_flg CHAR(1),
+PERIOD FOR business_time(processing_date_start, processing_date_end),
+PERIOD FOR system_time(createte_at, modified_at),
+PRIMARY KEY(gp_konto_hk,processing_date_end)
+)WITH SYSTEM VERSIONING;
+
+---------------------------------
+
 CREATE TABLE biz.l_gp_cc(
 gp_cc_hk CHAR(32),
 kreditkarte_hk CHAR(32),

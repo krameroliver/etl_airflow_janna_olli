@@ -12,9 +12,10 @@ default_args={
     }
 
 d = DAG(dag_id='load_all_source',
-        schedule_interval="@daily",
+        schedule_interval="@once",
         default_args=default_args,
-        catchup=False)
+        catchup=False,
+        tags=['ENB'])
 
 startAllTasks = BashOperator(
     task_id='start',
