@@ -18,7 +18,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(acct_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE or replace TABLE acct_hist(
 account_id VARCHAR(11),
 district_id INTEGER,
@@ -39,7 +39,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(acct_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 create or replace TABLE district(
 district_id INTEGER,
 city VARCHAR(255),
@@ -59,7 +59,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(district_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 create or replace TABLE district_hist(
 district_id INTEGER,
 city VARCHAR(255),
@@ -79,7 +79,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(district_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE card(
 card_id VARCHAR(10),
 disp_id VARCHAR(10),
@@ -100,7 +100,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(card_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE card_hist(
 card_id VARCHAR(10),
 disp_id VARCHAR(10),
@@ -121,7 +121,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(card_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE client(
 client_id VARCHAR(10 ),
 sex VARCHAR(6 ),
@@ -154,7 +154,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(client_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE client_hist(
 client_id VARCHAR(10 ),
 sex VARCHAR(6 ),
@@ -187,7 +187,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(client_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE disposition(
 disp_id VARCHAR(10 ),
 client_id VARCHAR(10 ),
@@ -205,7 +205,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(disposition_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE disposition_hist(
 disp_id VARCHAR(10 ),
 client_id VARCHAR(10 ),
@@ -223,7 +223,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(disposition_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE loan(
 loan_id VARCHAR(10 ),
 account_id VARCHAR(10 ),
@@ -249,7 +249,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(loan_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE loan_hist(
 loan_id VARCHAR(10 ),
 account_id VARCHAR(10 ),
@@ -275,7 +275,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(loan_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE `order`(
 order_id VARCHAR(10 ),
 account_id VARCHAR(10 ),
@@ -295,7 +295,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(order_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE `order_hist`(
 order_id VARCHAR(10 ),
 account_id VARCHAR(10 ),
@@ -315,7 +315,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(order_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE trans(
 run_id bigint,
 trans_id text,
@@ -346,7 +346,7 @@ PERIOD FOR business_time(processing_date_start, processing_date_end),
 PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(trans_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
---delim
+
 CREATE TABLE trans_hist(
 run_id bigint,
 trans_id text,

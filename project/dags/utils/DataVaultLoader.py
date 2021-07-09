@@ -51,7 +51,8 @@ class DataVaultLoader():
 
     def satellit(self):
         self.Loader.insert()
-        self.Loader.update()
+        self.Loader.update_v2()
+        #self.Loader.update()
         self.Loader.delete()
 
     def hub(self):
