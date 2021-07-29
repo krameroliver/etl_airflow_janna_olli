@@ -10,13 +10,8 @@ except ImportError:
 def get_lkp_value(lkp_name: str):
     db_con = connect_to_db(layer='biz')
 
-    metadata = MetaData(bind=db_con)
-    metadata.reflect(bind=db_con, schema='biz')
-
-    target = metadata.tables['biz.' + lkp_name.upper()]
-    res = db_con.execute(target.select())
-
-    results = pd.DataFrame(columns=['auspraegung', 'ID'], data=res.fetchall()).to_dict('records')
+    res = pd.read_sql_table(table_name=lkp_name,con=db_con)
+    results = res.to_dict('records')
 
     lkp = {}
     for i in results:
@@ -26,6 +21,7 @@ def get_lkp_value(lkp_name: str):
             lkp[key] = val
         else:
             lkp[''] = 99
+            lkp[' '] = 99
             lkp[None] = 99
 
     return lkp
@@ -48,3 +44,4 @@ def get_reverse_lkp_value(lkp_name: str, lkp_id):
     lkp = lkp[lkp['ID'] == lkp_id]
 
     return lkp['auspraegung'].values[0]
+

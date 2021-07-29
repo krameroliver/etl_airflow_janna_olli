@@ -16,7 +16,7 @@ except ImportError:
 class DataVaultLoader():
 
     def __init__(self, data: pd.DataFrame, db_con, entity_name: str, t_name: str, date: str = None, schema: str = None,
-                 commit_size: int = 10000):
+                 commit_size: int = 10000, useSingeFetch: bool = False):
         self.data = data
         self.db_con = db_con
         self.entity_name = entity_name
@@ -25,7 +25,7 @@ class DataVaultLoader():
         self.schema = schema
         self.commit_size = commit_size
         self.target_table = None
-
+        self.useSingeFetch = useSingeFetch
         if os.path.isfile(r'/Configs/ENB/' + self.entity_name + '.yaml'):
             conf = r'/Configs/ENB/' + self.entity_name + '.yaml'
         else:
@@ -36,11 +36,13 @@ class DataVaultLoader():
         self.table_type = self.documents[entity_name]['tables'][self.t_name]['table_type']
 
         self.Loader = LoadtoDB(data=self.data, db_con=self.db_con, t_name=self.t_name, date=self.date,
-                               schema=self.schema, commit_size=self.commit_size, entityName=self.entity_name)
+                               schema=self.schema, commit_size=self.commit_size, entityName=self.entity_name,
+                               useSingeFetch=True,t_type=self.table_type)
 
     @property
     def load(self):
         if self.table_type == "satellit":
+
             self.satellit()
         elif self.table_type == "hub":
             self.hub()
@@ -50,23 +52,18 @@ class DataVaultLoader():
             print(colored('ERROR:', color='red') + ' Kein Zulaessiger Tabellen-Typ gefunden')
 
     def satellit(self):
+
         self.Loader.insert()
         self.Loader.update_v2()
-        #self.Loader.update()
         self.Loader.delete()
 
     def hub(self):
-        try:
-            self.Loader.insert()
-        except:
-            logging.warn('inserts not done!')
+        self.Loader.insert()
+
 
     def link(self):
-        try:
-            self.Loader.insert()
-        except:
-            logging.warn('inserts not done!')
+        self.Loader.insert()
+
 
     def __repr__(self):
         return (self.Loader.__repr__())
-

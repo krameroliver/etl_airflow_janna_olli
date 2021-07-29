@@ -3,7 +3,7 @@ import os
 
 import yaml
 import platform
-
+from project.dags.utils.ILoader import ILoader
 try:
     from utils.DataVaultLoader import DataVaultLoader
     from utils.TableReader import read_raw_sql_sat
@@ -37,10 +37,9 @@ def read_write_source(file, date, table, delm, header):
         conf_r = r'/Configs/ENB/'
         source_path = r'/rawdata/ENB/'
     else:
-        conf_r = r'../Configs/ENB/'
-        source_path = r'../../rawdata/ENB/'
+        conf_r = r'C:\Users\oliver\PycharmProjects\airflow\project\dags\Configs\ENB'
+        source_path = r'W:\Workspaces\pycharm\etl_airflow_janna_olli\project\rawdata\ENB'
 
-    print(os.path.abspath(os.getcwd()))
     p = os.path.join(conf_r, table + '.yaml').replace(r"\\\\",r"/")
     with open(p) as f:
         documents = yaml.full_load(f)
@@ -60,9 +59,12 @@ def read_write_source(file, date, table, delm, header):
     data = pd.read_csv(source_path, delimiter=delm, header=header, dtype=rel_types, parse_dates=parse_list,
                        infer_datetime_format=True)
     data.fillna(value="", inplace=True)
-    data = add_technical_col(data=data, t_name=table, date=date, entity_name=table)
+
 
     con = connect_to_db(layer=layer)
-    dvl = DataVaultLoader(data=data, t_name=table, date=date, db_con=con, entity_name=table, schema=layer,
-                          commit_size=10000)
-    dvl.load
+    loader = ILoader(loading_sat=table,loader_type='flat',loading_entity=table,target_connection=con,schema='src',date=date)
+    loader.load(data=data)
+
+
+read_write_source(date='2018-12-31',header=0,table='acct',delm=',',file='acct.csv')
+read_write_source(date='2018-12-31',header=0,table='trans',delm=',',file='trans.csv')

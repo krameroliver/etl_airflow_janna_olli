@@ -6,6 +6,11 @@ konto:
         - 'frequenz'
         - 'wertstellungszeitpunkt'
         - 'kontoerstellung_dt'
+      data_types:
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
       businesskeys:
         - 'kontonummer'
       layer: 'biz'
@@ -14,6 +19,8 @@ konto:
     h_konto:
       fields:
         - 'kontonummer'
+      data_types:
+        - 'str'
       businesskeys:
         - 'kontonummer'
       layer: 'biz'

@@ -11,13 +11,23 @@ transaktion:
         - 'payment_type'
       businesskeys:
         - 'transaktions_id'
+      data_types:
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
       layer: 'biz'
       hash_key: 'transaktion_hk'
       table_type: 'satellit'
     h_transaktion:
       fields:
         - 'transaktions_id'
-        - 'transaktion_hk'
+      data_types:
+        - 'str'
+        - 'str'
       businesskeys:
         - 'transaktions_id'
       layer: 'biz'

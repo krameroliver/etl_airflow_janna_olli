@@ -15,3 +15,5 @@ PyYaml
 marquez-python
 marquez-airflow
 sshtunnel
+swifter
+pykeepass

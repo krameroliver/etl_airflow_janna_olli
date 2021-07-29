@@ -37,4 +37,3 @@ class dynamic_lkp:
         self.lkp_data.to_sql(schema='biz', con=db_con_biz, if_exists='replace', name=lookup_name.upper(),
                              index=False)
 
-

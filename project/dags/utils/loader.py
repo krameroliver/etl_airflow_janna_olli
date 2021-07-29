@@ -28,7 +28,6 @@ def load(data: pd.DataFrame, db_con, t_name:str, date:str, schema:str=None,commi
     tmptbl.name = temp_table
 
     data = add_technical_col(data=data, t_name=t_name, date=None)
-    #data.to_sql(name=temp_table,con=db_con,schema='tmp',if_exists='replace',chunksize=commit_size)
     Upsert(engine=con).to_mysql(df=data,
                                    target_table=trans[0],
                                    temp_table=tmptbl,

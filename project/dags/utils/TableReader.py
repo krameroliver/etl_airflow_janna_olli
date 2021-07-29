@@ -22,11 +22,7 @@ def read_raw_sql_hub(db_con, t_name: str, date: str, schema: str):
 
 
 def read_raw_sql_sat(db_con, t_name: str, date: str, schema: str):
-    if date == None:
-        processing_date_start = datetime.date.today().strftime("%Y-%m-%d")
-    else:
-        processing_date_start = date
-
+    print(colored("Lese tabelle {0}".format(t_name)))
     metadata = MetaData(bind=db_con)
     metadata.reflect(bind=db_con, schema=schema)
 
@@ -41,6 +37,7 @@ def read_raw_sql_sat(db_con, t_name: str, date: str, schema: str):
     df = df[df['processing_date_start'] <= date_date]
     df = df[df['processing_date_end'] > date_date]
     df = df.reset_index()
+    print(colored('es wurden {0} datensaetze aus der Tabelle {1} gelesen'.format(df.shape[0], t_name)))
     return df
 
 
