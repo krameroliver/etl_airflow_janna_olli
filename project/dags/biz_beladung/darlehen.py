@@ -1,3 +1,4 @@
+import hashlib
 import os
 from datetime import datetime
 
@@ -5,16 +6,20 @@ import pandas as pd
 import yaml
 from termcolor2 import colored
 
+
+
 try:
     from utils.DataVaultLoader import DataVaultLoader
     from utils.TableReader import read_raw_sql_sat
     from utils.TechFields import add_technical_col
     from utils.db_connection import connect_to_db
+    from utils.ILoader import ILoader
 except ImportError:
     from project.dags.utils.DataVaultLoader import DataVaultLoader
     from project.dags.utils.TableReader import read_raw_sql_sat
     from project.dags.utils.TechFields import add_technical_col
     from project.dags.utils.db_connection import connect_to_db
+    from project.dags.utils.ILoader import ILoader
 
 
 class Darlehen:
@@ -62,7 +67,6 @@ class Darlehen:
         with open(self.conf_r + self.target + '.yaml') as file:
             documents = yaml.full_load(file)
         sat_target_fields = documents[self.target]['tables']['s_' + self.target]['fields']
-        hub_target_fields = documents[self.target]['tables']['h_' + self.target]['fields']
         sat_res_data = pd.DataFrame(columns=sat_target_fields)
 
         sat_res_data['kontonummer'] = data['account_id']
@@ -74,23 +78,20 @@ class Darlehen:
         sat_res_data['futurecashflow'] = data['duration']
         sat_res_data['verwendungszweck'] = data['purpose'].apply(lambda x: self.lkp_verwendungszweck(x))
         sat_res_data['loeschung'] = 10
-
+        sat_res_data[documents[self.target]['tables']['s_' + self.target]['hash_key']] = data['loan_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
         return sat_res_data
 
     def writeToDB(self, data: pd.DataFrame):
         print(colored('INFO: Entity ' + self.target, color='green'))
-        con = connect_to_db(layer=self.schema_trg)
-        sat_data = add_technical_col(data=data, t_name="s_darlehen", date=self.date, entity_name=self.target)
-        with open(self.conf_r + self.target + '.yaml') as file:
-            documents = yaml.full_load(file)
-        hub_target_fields = documents[self.target]['tables']['h_' + self.target]['fields']
-        hub_res_data = pd.DataFrame(columns=hub_target_fields)
-        hub_res_data[hub_target_fields] = sat_data[hub_target_fields]
 
-        dv_sat = DataVaultLoader(data=sat_data, db_con=con, entity_name=self.target, t_name="s_darlehen",
-                                 date=self.date, schema=self.schema_trg)
-        dv_hub = DataVaultLoader(data=hub_res_data, db_con=con, entity_name=self.target, t_name="h_darlehen",
-                                 date=self.date, schema=self.schema_trg)
-        dv_sat.load
-        dv_hub.load
+
+        con = connect_to_db(layer=self.schema_trg)
+        loader = ILoader(date=self.date, loader_type='datavault', loading_sat='s_darlehen', loading_entity=self.target,
+                         target_connection=con,
+                         schema=self.schema_trg)
+        loader.load(data=data)
         print('--- Beladung Ende ---\n')
+
+
+entity = Darlehen(date='2018-12-31')
+entity.writeToDB(entity.mapping(entity.join()))

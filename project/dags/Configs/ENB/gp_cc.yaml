@@ -14,6 +14,9 @@ gp_cc:
       fields:
         - kreditkarte_hk
         - geschaeftspartner_hk
+      data_types:
+        - 'str'
+        - 'str'
       businesskeys:
         - kreditkarte_hk
         - geschaeftspartner_hk

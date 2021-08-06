@@ -15,6 +15,10 @@ cc_konto:
         - rolle
         - kreditkarte_hk
         - konto_hk
+      data_types:
+        - 'str'
+        - 'str'
+        - 'str'
       businesskeys:
         - kreditkarte_hk
         - konto_hk

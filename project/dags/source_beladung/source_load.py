@@ -37,8 +37,8 @@ def read_write_source(file, date, table, delm, header):
         conf_r = r'/Configs/ENB/'
         source_path = r'/rawdata/ENB/'
     else:
-        conf_r = r'C:\Users\oliver\PycharmProjects\airflow\project\dags\Configs\ENB'
-        source_path = r'W:\Workspaces\pycharm\etl_airflow_janna_olli\project\rawdata\ENB'
+        conf_r = r'C:\Users\Oliver\WorkSpaces\python\etl_airflow_janna_olli\project\dags\Configs\ENB'
+        source_path = r'D:\Workspaces\pycharm\etl_airflow_janna_olli\project\rawdata\ENB'
 
     p = os.path.join(conf_r, table + '.yaml').replace(r"\\\\",r"/")
     with open(p) as f:
@@ -60,11 +60,16 @@ def read_write_source(file, date, table, delm, header):
                        infer_datetime_format=True)
     data.fillna(value="", inplace=True)
 
-
     con = connect_to_db(layer=layer)
     loader = ILoader(loading_sat=table,loader_type='flat',loading_entity=table,target_connection=con,schema='src',date=date)
     loader.load(data=data)
 
 
-read_write_source(date='2018-12-31',header=0,table='acct',delm=',',file='acct.csv')
-read_write_source(date='2018-12-31',header=0,table='trans',delm=',',file='trans.csv')
+#read_write_source(file='acct.csv', date="2018-12-31", table='acct', header=0, delm=',')
+#read_write_source(file='card.csv', date="2018-12-31", table='card', header=0, delm=',')
+#read_write_source(file='client.csv', date="2018-12-31", table='client', header=0, delm=',')
+#read_write_source(file='disposition.csv', date="2018-12-31", table='disposition', header=0, delm=',')
+#read_write_source(file='district.csv', date="2018-12-31", table='district', header=0, delm=',')
+#read_write_source(file='loan.csv', date="2018-12-31", table='loan', header=0, delm=',')
+#read_write_source(file='order.csv', date="2018-12-31", table='order', header=0, delm=',')
+#read_write_source(file='trans.csv', date="2018-12-31", table='trans', header=0, delm=',')

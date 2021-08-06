@@ -52,9 +52,8 @@ class DataVaultLoader():
             print(colored('ERROR:', color='red') + ' Kein Zulaessiger Tabellen-Typ gefunden')
 
     def satellit(self):
-
-        self.Loader.insert()
         self.Loader.update_v2()
+        self.Loader.insert()
         self.Loader.delete()
 
     def hub(self):

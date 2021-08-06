@@ -52,7 +52,7 @@ PRIMARY KEY(trans_konto_hk,processing_date_end)
 CREATE TABLE biz.l_darlehen_konto(
 darlehen_konto_hk CHAR(32),
 konto_hk CHAR(32),
-transaktion_hk CHAR(32),
+darlehen_hk CHAR(32),
 PRIMARY KEY(darlehen_konto_hk)
 );
 
@@ -105,7 +105,7 @@ CREATE TABLE biz.l_gp_cc(
 gp_cc_hk CHAR(32),
 kreditkarte_hk CHAR(32),
 geschaeftspartner_hk CHAR(32),
-PRIMARY KEY(link_gp_cc_hk)
+PRIMARY KEY(gp_cc_hk)
 );
 
 CREATE TABLE biz.l_m_gp_cc(
@@ -132,7 +132,7 @@ CREATE TABLE biz.l_cc_konto(
 cc_konto_hk CHAR(32),
 kreditkarte_hk CHAR(32),
 konto_hk CHAR(32),
-PRIMARY KEY(cc_trans_hk)
+PRIMARY KEY(cc_konto_hk)
 );
 
 CREATE TABLE biz.l_m_cc_konto(

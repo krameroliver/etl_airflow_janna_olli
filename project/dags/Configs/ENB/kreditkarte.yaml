@@ -6,6 +6,11 @@ kreditkarte:
         - 'beginndatum'
         - 'kartentyp'
         - 'loeschung'
+      data_types:
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
       businesskeys:
         - 'kartennummer'
       layer: 'biz'

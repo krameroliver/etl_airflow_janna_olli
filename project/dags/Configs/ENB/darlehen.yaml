@@ -11,6 +11,16 @@ darlehen:
         - 'verwendungszweck'
         - 'futurecashflow'
         - 'loeschung'
+      data_types:
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
+        - 'str'
       businesskeys:
         - 'kontonummer'
       layer: 'biz'
@@ -19,7 +29,6 @@ darlehen:
     h_darlehen:
       fields:
         - 'kontonummer'
-        - 'darlehen_hk'
       businesskeys:
         - 'kundennummer'
       layer: 'biz'

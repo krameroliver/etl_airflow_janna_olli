@@ -4,8 +4,7 @@ import hashlib
 import os
 
 
-def add_technical_col(data: pd.DataFrame,t_name:str,date:str=None,entity_name:str=None):
-
+def add_technical_col(data: pd.DataFrame, t_name: str, date: str = None, entity_name: str = None):
     if os.path.isfile(r'/Configs/ENB/{entity}.yaml'.format(entity=entity_name)):
         conf = r'/Configs/ENB/{entity}.yaml'.format(entity=entity_name)
     else:
@@ -14,18 +13,14 @@ def add_technical_col(data: pd.DataFrame,t_name:str,date:str=None,entity_name:st
     with open(conf) as file:
         documents = yaml.full_load(file)
 
-    if entity_name == None:
+    if entity_name is None:
         entity = t_name
     else:
         entity = entity_name
 
-
-    data = data[documents[entity]['tables'][t_name]['fields']]
-    bkf = documents[entity]['tables'][t_name]['businesskeys']
-    hk_name = documents[entity]['tables'][t_name]['hash_key']
-#    else:
-#        pass
-
+    fields = documents[entity]['tables'][t_name]['fields']
+    fields.append(documents[entity]['tables'][t_name]['hash_key'])
+    data = data[fields]
     data['diff_str'] = data.astype(str).agg('|'.join, axis=1)
     data["diff_hk"] = data['diff_str'].astype(str).apply(
         lambda x: hashlib.md5(x.encode()).hexdigest().upper())
@@ -37,14 +32,12 @@ def add_technical_col(data: pd.DataFrame,t_name:str,date:str=None,entity_name:st
 
     # hash-key berechnen
 
-    if len(bkf) == 1:
-        data[hk_name] = data[bkf[0]].astype(str).apply(
-            lambda x: hashlib.md5(x.encode()).hexdigest().upper())
-    else:
-        data[t_name + '_str'] = data.astype(str).agg(''.join, axis=1)
-        data[hk_name] = data[t_name + '_str'].astype(str).apply(
-            lambda x: hashlib.md5(x.encode()).hexdigest().upper())
-        data.drop(inplace=True, columns=t_name + '_str')
+    # if len(bkf) == 1:
+    #     data[hk_name] = data[bkf[0]].astype(str).apply(
+    #         lambda x: hashlib.md5(x.encode()).hexdigest().upper())
+    # else:
+    #     data[t_name + '_str'] = data.astype(str).agg(''.join, axis=1)
+    #     data[hk_name] = data[t_name + '_str'].astype(str).apply(
+    #         lambda x: hashlib.md5(x.encode()).hexdigest().upper())
+    #     data.drop(inplace=True, columns=t_name + '_str')
     return data
-
-

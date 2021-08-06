@@ -1,6 +1,7 @@
 # Import Pakete
 # import utils as u
 # import utils as u
+import hashlib
 import os
 from datetime import datetime
 
@@ -13,11 +14,13 @@ try:
     from utils.TableReader import read_raw_sql_sat
     from utils.TechFields import add_technical_col
     from utils.db_connection import connect_to_db
+    from utils.ILoader import ILoader
 except ImportError:
     from project.dags.utils.DataVaultLoader import DataVaultLoader
     from project.dags.utils.TableReader import read_raw_sql_sat
     from project.dags.utils.TechFields import add_technical_col
     from project.dags.utils.db_connection import connect_to_db
+    from project.dags.utils.ILoader import ILoader
 
 class Gp:
     def __init__(self, date):
@@ -75,6 +78,7 @@ class Gp:
         counts = data.groupby(by=['client_id']).size().reset_index(name='counts')
         data = data.merge(counts, how='left', left_on='client_id', right_on='client_id')
         out_data['kreditkartenanzahl'] = data['counts']
+        out_data['geschaeftspartner_hk'] = data['client_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
 
         return out_data
 
@@ -99,7 +103,8 @@ class Gp:
         out_data['stadt'] = data['city']
         out_data['bundesland'] = data['state']
         out_data['postleitzahl'] = data['zipcode']
-
+        out_data['geschaeftspartner_hk'] = data['client_id'].apply(
+            lambda x: hashlib.md5(x.encode()).hexdigest().upper())
         return out_data
 
     def mapping_digitaleadresse(self, data: pd.DataFrame):
@@ -121,7 +126,8 @@ class Gp:
         phone_data['kundennummer'] = teil_df['client_id']
         phone_data['kontakttyp'] = 1
         phone_data['kontaktinfo'] = teil_df['phone']
-
+        phone_data['geschaeftspartner_hk'] = data['client_id'].apply(
+            lambda x: hashlib.md5(x.encode()).hexdigest().upper())
         '''
         Schritt 2: email daten filtern
         '''
@@ -140,58 +146,46 @@ class Gp:
     def writeToDB(self, data: pd.DataFrame):
         print(colored('INFO: Entity ' + self.target, color='green'))
         con = connect_to_db(layer=self.schema_trg)
-        sat_data = add_technical_col(data=data, t_name='s_geschaeftspartner', date=self.date, entity_name=self.target)
-        with open(self.conf_r + self.target + '.yaml') as file:
-            documents = yaml.full_load(file)
-        hub_target_fields = documents[self.target]['tables']['h_' + self.target]['fields']
-        hub_res_data = pd.DataFrame(columns=hub_target_fields)
-        hub_res_data[hub_target_fields] = sat_data[hub_target_fields]
 
-        dv_sat = DataVaultLoader(data=sat_data, db_con=con, entity_name=self.target, t_name='s_' + self.target,
-                                 date=self.date, schema=self.schema_trg)
-        dv_hub = DataVaultLoader(data=hub_res_data, db_con=con, entity_name=self.target, t_name='h_' + self.target,
-                                 date=self.date, schema=self.schema_trg)
-        dv_sat.load
-        dv_hub.load
+        loader = ILoader(date=self.date, loader_type='datavault',
+                         loading_sat='s_geschaeftspartner',
+                         loading_entity=self.target,
+                         target_connection=con,
+                         schema=self.schema_trg)
+        loader.load(data=data)
+
 
         print('--- Beladung Ende ---\n')
 
     def writeToDB_postalischeadd(self, data: pd.DataFrame):
         print(colored('INFO: Entity ' + self.target, color='green'))
         con = connect_to_db(layer=self.schema_trg)
-        sat_data = add_technical_col(data=data, t_name='s_geschaeftspartner_postalische_addresse', date=self.date,
-                                     entity_name=self.target)
-        with open(self.conf_r + self.target + '.yaml') as file:
-            documents = yaml.full_load(file)
-        hub_target_fields = documents[self.target]['tables']['h_' + self.target]['fields']
-        hub_res_data = pd.DataFrame(columns=hub_target_fields)
-        hub_res_data[hub_target_fields] = sat_data[hub_target_fields]
 
-        dv_sat = DataVaultLoader(data=sat_data, db_con=con, entity_name=self.target,
-                                 t_name="s_geschaeftspartner_postalische_addresse",
-                                 date=self.date, schema=self.schema_trg)
-        dv_hub = DataVaultLoader(data=hub_res_data, db_con=con, entity_name=self.target, t_name='h_' + self.target,
-                                 date=self.date, schema=self.schema_trg)
-        dv_sat.load
+        loader = ILoader(date=self.date, loader_type='datavault', loading_sat='s_geschaeftspartner_postalische_addresse',
+                         loading_entity=self.target,
+                         target_connection=con,
+                         schema=self.schema_trg)
+        loader.load(data=data)
 
         print('--- Beladung Ende ---\n')
 
     def writeToDB_digitale_add(self, data: pd.DataFrame):
         print(colored('INFO: Entity ' + self.target, color='green'))
         con = connect_to_db(layer=self.schema_trg)
-        sat_data = add_technical_col(data=data, t_name='m_geschaeftspartner_digitale_addresse', date=self.date,
-                                     entity_name=self.target)
-        with open(self.conf_r + self.target + '.yaml') as file:
-            documents = yaml.full_load(file)
-        hub_target_fields = documents[self.target]['tables']['h_' + self.target]['fields']
-        hub_res_data = pd.DataFrame(columns=hub_target_fields)
-        hub_res_data[hub_target_fields] = sat_data[hub_target_fields]
+        loader = ILoader(date=self.date, loader_type='datavault', loading_sat='m_geschaeftspartner_digitale_addresse', loading_entity=self.target,
+                         target_connection=con,
+                         schema=self.schema_trg)
+        loader.load(data=data)
 
-        dv_sat = DataVaultLoader(data=sat_data, db_con=con, entity_name=self.target,
-                                 t_name='m_geschaeftspartner_digitale_addresse',
-                                 date=self.date, schema=self.schema_trg)
-        dv_hub = DataVaultLoader(data=hub_res_data, db_con=con, entity_name=self.target, t_name='h_' + self.target,
-                                 date=self.date, schema=self.schema_trg)
-        dv_sat.load
 
         print('--- Beladung Ende ---\n')
+
+
+entity = Gp(date='2018-12-31')
+entity.writeToDB(entity.mapping(entity.join()))
+
+entity = Gp(date='2018-12-31')
+entity.writeToDB_postalischeadd(entity.mapping_postalischeadresse(entity.join()))
+
+entity = Gp(date='2018-12-31')
+entity.writeToDB_digitale_add(entity.mapping_digitaleadresse(entity.join()))

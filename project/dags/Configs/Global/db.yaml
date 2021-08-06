@@ -11,3 +11,11 @@ database:
     #sshpw: Z4ykW#&q*5
     useSSH: False
     main: PoeticDrunkenCat
+  MongoDB:
+    port: 27017
+    host: localhost
+    db_name: PoeticDrunkenCat
+  ARIMA_EXPORT:
+    path: 'C:\Users\Public\EXPORTS'
+    format: 'csv'
+    

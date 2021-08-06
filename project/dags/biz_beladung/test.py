@@ -3,28 +3,16 @@ import pandas as pd
 import numpy as np
 from datetime import time
 
-target = 'trans'
-with open(r'../Configs/ENB/' + target + '.yaml') as file:
-    documents = yaml.full_load(file)
-target_fields = documents[target]['tables']['trans']['fields']
-data_types=documents[target]['tables']['trans']['data_types']
-rel_types = {}
-parse_list = []
-for k,i in enumerate(target_fields):
-    if data_types[k] != 'DATUM':
-        rel_types[i] = data_types[k]
-    else:
-        rel_types[i] = 'str'
-        parse_list.append(i)
+from project.dags.utils.build_dynamic_lookup import dynamic_lkp
+from project.dags.utils.build_static_lookup import static_lookup
 
-print(rel_types)
-print(parse_list)
+dynamic_lkp().post_lkp(tablename='card',lookup_name='CARTTYPE',column='card_type')
+dynamic_lkp().post_lkp(tablename='loan',lookup_name='STATUS',column='status')
+dynamic_lkp().post_lkp(tablename='trans',lookup_name='cf_operation',column='operation')
+dynamic_lkp().post_lkp(tablename='trans',lookup_name='payment_type',column='k_symbol')
 
 
-
-data=pd.read_csv(r'../../rawdata/ENB/2018-12-31/trans.csv', delimiter=',',header=0, dtype=rel_types,parse_dates=parse_list,infer_datetime_format=True)
-
-
-
-print(data[['fulldate', 'fulltime', 'fulldatewithtime', 'date']])
-
+static_lookup().build_lkp(lookup_name='SEX', lkp_data= {'auspraegung': ['Female', 'Male', 'Div'], 'ID': [0, 1, 2]})
+static_lookup().build_lkp(lookup_name='ANREDE', lkp_data= {'auspraegung': ['Female', 'Male', 'Div'], 'ID': ['Frau', 'Herr', 'Mensch']})
+static_lookup().build_lkp(lookup_name='DURCHSCHNITTSALTER', lkp_data= {'auspraegung': ['Female', 'Male', 'Div'], 'ID': [84, 79, 82]})
+static_lookup().build_lkp(lookup_name='USER_TYPE', lkp_data={'auspraegung': ['User', 'Owner', ''], 'ID': [2, 1, 0]})

@@ -11,11 +11,13 @@ try:
     from utils.TableReader import read_raw_sql_sat
     from utils.TechFields import add_technical_col
     from utils.db_connection import connect_to_db
+    from utils.ILoader import ILoader
 except ImportError:
     from project.dags.utils.DataVaultLoader import DataVaultLoader
     from project.dags.utils.TableReader import read_raw_sql_sat
     from project.dags.utils.TechFields import add_technical_col
     from project.dags.utils.db_connection import connect_to_db
+    from project.dags.utils.ILoader import ILoader
 
 
 class Link_TRANS_KONTO:
@@ -66,28 +68,18 @@ class Link_TRANS_KONTO:
 
     def writeToDB(self, data: pd.DataFrame):
         logging.info(colored('INFO: Entity ' + self.target, color='green'))
+
         con = connect_to_db(layer=self.schema_trg)
-        sat_data = add_technical_col(data=data, t_name="l_s_trans_konto", date=self.date, entity_name=self.target)
-        with open(self.conf_r + self.target + '.yaml') as file:
-            documents = yaml.full_load(file)
-        hub_target_fields = documents[self.target]['tables']['l_trans_konto']['fields']
-        hub_target_fields.append(documents[self.target]['tables']['l_trans_konto']['hash_key'])
-        hub_res_data = pd.DataFrame(columns=hub_target_fields)
-        hub_res_data[hub_target_fields] = sat_data[hub_target_fields]
 
-        print('SAT')
+        loader = ILoader(date=self.date, loader_type='datavault',
+                         loading_sat='l_s_trans_konto',
+                         loading_entity=self.target,
+                         target_connection=con,
+                         schema=self.schema_trg)
+        loader.load(data=data)
 
-        dv_sat = DataVaultLoader(data=sat_data, db_con=con, entity_name=self.target, t_name='l_s_trans_konto',
-                                 date=self.date, schema=self.schema_trg)
-
-        dv_sat.load
-
-        print('HUB')
-
-        dv_hub = DataVaultLoader(data=hub_res_data, db_con=con, entity_name=self.target, t_name='l_trans_konto',
-                                 date=self.date, schema=self.schema_trg)
-
-        dv_hub.load
         logging.info('--- Beladung Ende ---\n')
 
 
+entity = Link_TRANS_KONTO(date='2018-12-31')
+entity.writeToDB(entity.mapping(entity.join()))

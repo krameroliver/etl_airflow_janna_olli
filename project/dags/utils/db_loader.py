@@ -46,7 +46,6 @@ class LoadtoDB():
         self.target_table = None
         self.entityName = entityName
         self.useSingeFetch = useSingeFetch
-
         if date == None:
             self.processing_date_start = datetime.date.today().strftime("%Y-%m-%d")
         else:
@@ -60,7 +59,6 @@ class LoadtoDB():
         if entityName == None:
             with open(conf_r + t_name + '.yaml') as file:
                 self.documents = yaml.full_load(file)
-            print(t_name)
             self.hk = self.documents[t_name]['hash_key']
             self.fields = self.documents[t_name]['fields']
         else:
@@ -82,7 +80,8 @@ class LoadtoDB():
         stmt = 'select {0} from {1}.{2}'.format(self.hk, self.schema, self.t_name)
         table_hk = list(db_con.execute(stmt).fetchall())
         table_hk = [i[0] for i in table_hk]
-
+        print(self.t_name)
+        print(self.data.columns)
         df_hk = list(self.data[self.hk])
         print('reduce')
 
@@ -131,23 +130,28 @@ class LoadtoDB():
     def insert(self):
         conn = self.db_con.connect()
         self.insert_df.drop_duplicates(inplace=True)
+        print('hier')
+
         if self.insert_df.shape[0] > 0:
+
+
 
             print('Start Insert:')
             self.insert_df['processing_date_start'] = self.processing_date_start
+            _f = self.fields
+            _f.append(self.hk)
+            self.insert_df = self.insert_df[_f]
             _anz = 1
-            record_list = self.insert_df.to_dict('record')
+            record_list = self.insert_df.to_dict(orient='record')
             print('build chunks')
             chunks = list(divide_chunks(record_list, self.commit_size))
             print('number of chunks:{0}'.format(len(chunks)))
             for i in chunks:
                 self.target_table.name = self.t_name
                 conn.execute(self.target_table.insert(), i)
-
-            conn.execute('commit')
+                conn.execute('commit')
         else:
             print('Nichts zu inserten')
-        conn.close()
         print('Ende Insert: DB closed')
 
     def delete(self):
@@ -193,11 +197,19 @@ class LoadtoDB():
         rel_types = {}
         parse_list = []
         for k, i in enumerate(fields):
-            if fields_types[k] != 'DATUM':
-                rel_types[i] = fields_types[k]
-            else:
-                rel_types[i] = 'str'
-                parse_list.append(i)
+            try:
+                if fields_types[k] != 'DATUM':
+                    rel_types[i] = fields_types[k]
+                else:
+                    rel_types[i] = 'str'
+                    parse_list.append(i)
+            except:
+                if fields_types[k] != 'DATUM':
+                    rel_types[i] = fields_types[k]
+                else:
+                    rel_types[i] = 'str'
+                    parse_list.append(i)
+
 
         if self.useSingeFetch and chunks > 1:
             for i in range(int(chunks)):
@@ -224,20 +236,24 @@ class LoadtoDB():
                 for c in fields:
                     if c not in [self.hk]:
                         _temp = merged_df[merged_df[self.hk] == hk]
-                        try:
-                            _t1 = round(_temp[c].values[0], 0)
-                            _t2 = round(_temp[c + '_'].values[0], 0)
-                        except:
-                            _t1 = _temp[c].values[0]
-                            _t2 = _temp[c + '_'].values[0]
+                        if _temp.shape[0]>0:
+                            try:
+                                _t1 = round(_temp[c].values[0], 0)
+                                _t2 = round(_temp[c + '_'].values[0], 0)
+                            except:
+                                try:
+                                    _t1 = _temp[c].values[0]
+                                    _t2 = _temp[c + '_'].values[0]
+                                except:
+                                    pass
 
-                        if _t1 != _t2:
-                            diff_hks.append(hk)
+                            if _t1 != _t2:
+                                diff_hks.append(hk)
 
             update_df = self.update_df[self.update_df[self.hk].isin(diff_hks)]
             k = [i for i in fields if i != self.hk]
             update_df['diff_str'] = update_df[k].astype(str).agg('|'.join, axis=1)
-            update_df["diff_hk"] = update_df['diff_str'].astype(str).swifter.apply(
+            update_df["diff_hk"] = update_df['diff_str'].astype(str).apply(
                 lambda x: hashlib.md5(x.encode()).hexdigest().upper())
             if update_df.shape[0] > 0:
                 for row in range(update_df.shape[0]):

@@ -14,12 +14,14 @@ try:
     from utils.TechFields import add_technical_col
     from utils.db_connection import connect_to_db
     from utils.lookup import get_lkp_value
+    from utils.ILoader import ILoader
 except ImportError:
     from project.dags.utils.DataVaultLoader import DataVaultLoader
     from project.dags.utils.TableReader import read_raw_sql_sat
     from project.dags.utils.TechFields import add_technical_col
     from project.dags.utils.db_connection import connect_to_db
     from project.dags.utils.lookup import get_lkp_value
+    from project.dags.utils.ILoader import ILoader
 
 
 class Link_GP_KONTO:
@@ -71,23 +73,15 @@ class Link_GP_KONTO:
     def writeToDB(self, data: pd.DataFrame):
         logging.info(colored('INFO: Entity ' + self.target, color='green'))
         con = connect_to_db(layer=self.schema_trg)
-        sat_data = add_technical_col(data=data, t_name="l_m_gp_konto", date=self.date, entity_name=self.target)
-        with open(self.conf_r + self.target + '.yaml') as file:
-            documents = yaml.full_load(file)
-        hub_target_fields = documents[self.target]['tables']['l_gp_konto']['fields']
-        hub_target_fields.append(documents[self.target]['tables']['l_gp_konto']['hash_key'])
-        hub_res_data = pd.DataFrame(columns=hub_target_fields)
-        hub_res_data[hub_target_fields] = sat_data[hub_target_fields]
 
-        dv_sat = DataVaultLoader(data=sat_data, db_con=con, entity_name=self.target, t_name='l_m_gp_konto',
-                                 date=self.date, schema=self.schema_trg)
-        dv_sat.load
-        del(dv_sat)
-        del(sat_data)
-        dv_hub = DataVaultLoader(data=hub_res_data, db_con=con, entity_name=self.target, t_name='l_gp_konto',
-                                 date=self.date, schema=self.schema_trg)
+        loader = ILoader(date=self.date, loader_type='datavault',
+                         loading_sat='l_m_gp_konto',
+                         loading_entity=self.target,
+                         target_connection=con,
+                         schema=self.schema_trg)
+        loader.load(data=data)
 
-        dv_hub.load
+
         logging.info('--- Beladung Ende ---\n')
 
 
