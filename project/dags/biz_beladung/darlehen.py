@@ -5,8 +5,8 @@ from datetime import datetime
 import pandas as pd
 import yaml
 from termcolor2 import colored
-
-
+import warnings
+warnings.filterwarnings("ignore")
 
 try:
     from utils.DataVaultLoader import DataVaultLoader
@@ -36,12 +36,14 @@ class Darlehen:
             self.conf_r = r'../Configs/ENB/'
 
     def join(self):
-        loan = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
-                                t_name=self.src_loan)
+        _loan = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
+                                 t_name=self.src_loan)
         with open(self.conf_r + self.src_loan + '.yaml') as file:
             documents = yaml.full_load(file)
         field_list = documents[self.src_loan]['tables'][self.src_loan]['fields']
-        loan = loan[field_list]
+        field_list.append(documents[self.src_loan]['tables'][self.src_loan]['hash_key'])
+        loan = _loan[field_list]
+
         return loan
 
     def lkp_status(self, stat: str):
@@ -68,7 +70,8 @@ class Darlehen:
             documents = yaml.full_load(file)
         sat_target_fields = documents[self.target]['tables']['s_' + self.target]['fields']
         sat_res_data = pd.DataFrame(columns=sat_target_fields)
-
+        with open(self.conf_r + self.src_loan + '.yaml') as file:
+            _documents = yaml.full_load(file)
         sat_res_data['kontonummer'] = data['account_id']
         sat_res_data['nominal'] = data['amount']
         sat_res_data['startdatum'] = data['fulldate']
@@ -78,17 +81,16 @@ class Darlehen:
         sat_res_data['futurecashflow'] = data['duration']
         sat_res_data['verwendungszweck'] = data['purpose'].apply(lambda x: self.lkp_verwendungszweck(x))
         sat_res_data['loeschung'] = 10
-        sat_res_data[documents[self.target]['tables']['s_' + self.target]['hash_key']] = data['loan_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
+        sat_res_data[documents[self.target]['tables']['s_' + self.target]['hash_key']] = data['loan_hk']
         return sat_res_data
 
     def writeToDB(self, data: pd.DataFrame):
         print(colored('INFO: Entity ' + self.target, color='green'))
 
-
         con = connect_to_db(layer=self.schema_trg)
         loader = ILoader(date=self.date, loader_type='datavault', loading_sat='s_darlehen', loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg)
+                         schema=self.schema_trg, build_hash_key=False)
         loader.load(data=data)
         print('--- Beladung Ende ---\n')
 

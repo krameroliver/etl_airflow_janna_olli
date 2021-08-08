@@ -9,9 +9,9 @@ from sqlalchemy import MetaData
 from termcolor2 import colored
 
 try:
-    from utils.utils import divide_chunks
+    from utils.utils import divide_chunks, tech_fields
 except ImportError:
-    from project.dags.utils.utils import divide_chunks
+    from project.dags.utils.utils import divide_chunks, tech_fields
 
 
 def element_is_in(comparelist, element):
@@ -80,10 +80,7 @@ class LoadtoDB():
         stmt = 'select {0} from {1}.{2}'.format(self.hk, self.schema, self.t_name)
         table_hk = list(db_con.execute(stmt).fetchall())
         table_hk = [i[0] for i in table_hk]
-        print(self.t_name)
-        print(self.data.columns)
         df_hk = list(self.data[self.hk])
-        print('reduce')
 
         table_hk_df = pd.DataFrame(data=table_hk, columns=['table_hk'])
 
@@ -105,8 +102,6 @@ class LoadtoDB():
         self.update_hk = updt_khs
         updt_khs.drop(['df_hk', 'table_hk'], axis=1)
 
-        print('reduce done')
-
         self.insert_df = data.merge(insrt_khs, how='inner', left_on=self.hk, right_on='hks')
         self.insert_df.drop(['hks'], axis=1)
 
@@ -116,7 +111,6 @@ class LoadtoDB():
         self.update_df = data.merge(insrt_khs, how='inner', left_on=self.hk, right_on='hks')
         self.update_df.drop(['hks'], axis=1)
 
-        print('build DATA Frames done')
         del (insrt_khs, del_khs, updt_khs, table_hk_df, df_hk_df)
 
     def __repr__(self):
@@ -130,37 +124,29 @@ class LoadtoDB():
     def insert(self):
         conn = self.db_con.connect()
         self.insert_df.drop_duplicates(inplace=True)
-        print('hier')
 
         if self.insert_df.shape[0] > 0:
 
-
-
-            print('Start Insert:')
             self.insert_df['processing_date_start'] = self.processing_date_start
             _f = self.fields
             _f.append(self.hk)
+            _f.extend(tech_fields)
             self.insert_df = self.insert_df[_f]
             _anz = 1
-            record_list = self.insert_df.to_dict(orient='record')
-            print('build chunks')
+            record_list = self.insert_df.to_dict('record')
             chunks = list(divide_chunks(record_list, self.commit_size))
-            print('number of chunks:{0}'.format(len(chunks)))
             for i in chunks:
                 self.target_table.name = self.t_name
                 conn.execute(self.target_table.insert(), i)
                 conn.execute('commit')
         else:
             print('Nichts zu inserten')
-        print('Ende Insert: DB closed')
 
     def delete(self):
 
-        print('Start Delete:')
         if self.delete_df.shape[0] > 0:
             conn = self.db_con.connect()
             conn.close()
-            print('Ende Delete: DB closed')
         else:
             print('Nichts zu loeschen')
 
@@ -210,7 +196,6 @@ class LoadtoDB():
                     rel_types[i] = 'str'
                     parse_list.append(i)
 
-
         if self.useSingeFetch and chunks > 1:
             for i in range(int(chunks)):
                 _df_list.append(pd.DataFrame(columns=fields_with_hk, data=result.fetchmany(self.commit_size)).astype(
@@ -223,7 +208,6 @@ class LoadtoDB():
         return old_data
 
     def update_v2(self):
-        print('Start Update:')
         fields = list(self.fields)
 
         if len(self.update_df[self.hk]) > 0:
@@ -236,7 +220,7 @@ class LoadtoDB():
                 for c in fields:
                     if c not in [self.hk]:
                         _temp = merged_df[merged_df[self.hk] == hk]
-                        if _temp.shape[0]>0:
+                        if _temp.shape[0] > 0:
                             try:
                                 _t1 = round(_temp[c].values[0], 0)
                                 _t2 = round(_temp[c + '_'].values[0], 0)
@@ -256,6 +240,7 @@ class LoadtoDB():
             update_df["diff_hk"] = update_df['diff_str'].astype(str).apply(
                 lambda x: hashlib.md5(x.encode()).hexdigest().upper())
             if update_df.shape[0] > 0:
+                chunk_stmt = []
                 for row in range(update_df.shape[0]):
                     record = update_df.iloc[row]
                     u_hk = record[self.hk]
@@ -265,19 +250,18 @@ class LoadtoDB():
                     set_part = ",\n".join(set_part)
 
                     stmt3 = "UPDATE " + self.schema + "." + self.target_table.name + " FOR PORTION OF business_time FROM '" + self.processing_date_start + "' TO '2262-04-11' SET " + set_part + ", mod_flg = 'U'  WHERE " + self.hk + " = '" + u_hk + "';"
+                    chunk_stmt.append(stmt3)
+                st = ';'.join(chunk_stmt)+";"
+                conn.execute(st)
 
-                    conn.execute(stmt3)
-                    if row % self.commit_size == 0:
-                        conn.execute('commit')
-                    if row % 100 == 0:
-                        print('.', end=' ')
+                conn.execute('commit')
+                if row % 100 == 0:
+                    print('.', end=' ')
         else:
             print('Keine Updates Vorhanden')
-        print('Ende Update: DB closed')
 
     def update(self):
         conn = self.db_con.connect()
-        print('Start Update:')
         fields = self.fields
         fields.append('diff_hk')
         table_u_hk = "('" + "','".join(self.update_hk) + "')"
@@ -307,7 +291,6 @@ class LoadtoDB():
                 for col in fields:
                     set_part.append(self.target_table.name + "." + col + "=" + "'" + str(record[col]) + "'")
                 set_part = ",\n".join(set_part)
-                # print(set_part)
                 stmt3 = "UPDATE " + self.schema + "." + self.target_table.name + " FOR PORTION OF business_time FROM '" + self.processing_date_start + "' TO '2262-04-11' SET " + set_part + ", mod_flg = 'U'  WHERE " + self.hk + " = '" + u_hk + "';"
 
                 conn.execute(stmt3)
@@ -317,4 +300,3 @@ class LoadtoDB():
                     print('.', end=' ')
 
         conn.close()
-        print('Ende Update: DB closed')

@@ -9,3 +9,6 @@ def divide_chunks(l, n):
     # looping till length l
     for i in range(0, len(l), n):
         yield l[i:i + n]
+
+
+tech_fields = ['record_source','diff_hk','processing_date_start','mod_flg']

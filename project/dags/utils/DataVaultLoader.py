@@ -13,7 +13,7 @@ except ImportError:
     from project.dags.utils.db_loader import LoadtoDB
 
 
-class DataVaultLoader():
+class DataVaultLoader:
 
     def __init__(self, data: pd.DataFrame, db_con, entity_name: str, t_name: str, date: str = None, schema: str = None,
                  commit_size: int = 10000, useSingeFetch: bool = False):
@@ -37,12 +37,11 @@ class DataVaultLoader():
 
         self.Loader = LoadtoDB(data=self.data, db_con=self.db_con, t_name=self.t_name, date=self.date,
                                schema=self.schema, commit_size=self.commit_size, entityName=self.entity_name,
-                               useSingeFetch=True,t_type=self.table_type)
+                               useSingeFetch=True, t_type=self.table_type)
 
     @property
     def load(self):
         if self.table_type == "satellit":
-
             self.satellit()
         elif self.table_type == "hub":
             self.hub()
@@ -52,17 +51,15 @@ class DataVaultLoader():
             print(colored('ERROR:', color='red') + ' Kein Zulaessiger Tabellen-Typ gefunden')
 
     def satellit(self):
-        self.Loader.update_v2()
+        #self.Loader.update_v2()
         self.Loader.insert()
         self.Loader.delete()
 
     def hub(self):
         self.Loader.insert()
 
-
     def link(self):
         self.Loader.insert()
-
 
     def __repr__(self):
         return (self.Loader.__repr__())

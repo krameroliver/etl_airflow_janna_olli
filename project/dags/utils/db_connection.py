@@ -15,7 +15,7 @@ def connect_to_db(layer: str = None):
         kp_path = r'/Configs/dwh.kdbx'
     else:
         config_file = r'../Configs/Global/db.yaml'
-        kp_path = r'C:\Users\Oliver\WorkSpaces\python\etl_airflow_janna_olli\project\dags\Configs\dwh.kdbx'
+        kp_path = r'/home/oliver/PycharmProjects/etl_airflow_janna_olli/project/dags/Configs/dwh.kdbx'
 
     with open(config_file) as file:
         documents = yaml.full_load(file)
@@ -46,7 +46,6 @@ def connect_to_db(layer: str = None):
         local_port = str(tunnel.local_bind_port)
         c_str = "mysql+pymysql://" + str(user) + ":" + str(psw) + "@" + str(host) + ":" + str(
             local_port) + "/" + str(layer) + "?charset=utf8mb4"
-        # c_str = ''
     else:
         c_str = "mysql+pymysql://" + str(user) + ":" + str(psw) + "@" + str(host) + ":" + str(port) + "/" + str(
             layer) + "?charset=utf8mb4"
