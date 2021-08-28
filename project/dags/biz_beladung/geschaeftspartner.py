@@ -31,6 +31,7 @@ class Gp:
         self.schema_src = 'src'
         self.src_client = 'client'
         self.src_disp = 'disposition'
+        self.load_domain = self.__class__.__name__.upper()
         self.src_card = 'card'
         if os.path.isdir(r'/Configs/ENB/'):
             self.conf_r = r'/Configs/ENB/'
@@ -64,6 +65,7 @@ class Gp:
         out_data['kundennummer'] = data['client_id']
         out_data['sozialversicherungsnummer'] = data['social']
         out_data['geburtsdatum'] = data['fulldate_x']
+        out_data['load_domain'] = self.load_domain
 
         sex = {'Female': 0, 'Male': 1, 'Div': 2}
         anrede = {'Female': 'Frau', 'Male': 'Herr', 'Div': 'Mensch'}
@@ -103,6 +105,7 @@ class Gp:
         out_data['stadt'] = data['city']
         out_data['bundesland'] = data['state']
         out_data['postleitzahl'] = data['zipcode']
+        out_data['load_domain'] = self.load_domain
         out_data['geschaeftspartner_hk'] = data['client_id'].apply(
             lambda x: hashlib.md5(x.encode()).hexdigest().upper())
         return out_data
@@ -126,6 +129,7 @@ class Gp:
         phone_data['kundennummer'] = teil_df['client_id']
         phone_data['kontakttyp'] = 1
         phone_data['kontaktinfo'] = teil_df['phone']
+        phone_data['load_domain'] = self.load_domain
         phone_data['geschaeftspartner_hk'] = data['client_id'].apply(
             lambda x: hashlib.md5(x.encode()).hexdigest().upper())
         '''
@@ -136,7 +140,9 @@ class Gp:
         mail_data['kundennummer'] = teil_df['client_id']
         mail_data['kontakttyp'] = 2
         mail_data['kontaktinfo'] = teil_df['email']
-
+        mail_data['load_domain'] = self.load_domain
+        mail_data['geschaeftspartner_hk'] = data['client_id'].apply(
+            lambda x: hashlib.md5(x.encode()).hexdigest().upper())
         '''
         Schritt 3: Joinen der Teildaten
         '''
@@ -151,7 +157,7 @@ class Gp:
                          loading_sat='s_geschaeftspartner',
                          loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg)
+                         schema=self.schema_trg,load_domain=self.load_domain)
         loader.load(data=data)
 
 
@@ -164,7 +170,7 @@ class Gp:
         loader = ILoader(date=self.date, loader_type='datavault', loading_sat='s_geschaeftspartner_postalische_addresse',
                          loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg)
+                         schema=self.schema_trg,load_domain=self.load_domain)
         loader.load(data=data)
 
         print('--- Beladung Ende ---\n')
@@ -174,7 +180,7 @@ class Gp:
         con = connect_to_db(layer=self.schema_trg)
         loader = ILoader(date=self.date, loader_type='datavault', loading_sat='m_geschaeftspartner_digitale_addresse', loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg)
+                         schema=self.schema_trg,load_domain=self.load_domain)
         loader.load(data=data)
 
 

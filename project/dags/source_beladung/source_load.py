@@ -4,6 +4,7 @@ import os
 import yaml
 import platform
 import warnings
+
 warnings.filterwarnings("ignore")
 
 try:
@@ -50,10 +51,10 @@ def read_write_source(file, date, table, delm, header):
         conf_r = r'/Configs/ENB/'
         source_path = r'/rawdata/ENB/'
     else:
-        conf_r = r'/home/oliver/PycharmProjects/etl_airflow_janna_olli/project/dags/Configs/ENB'
-        source_path = r'/mnt/nas/DataRepository/ENB'
+        conf_r = r'C:\Users\Oliver\WorkSpaces\python\etl_airflow_janna_olli\project\dags\Configs\ENB'
+        source_path = r'D:\Workspaces\pycharm\etl_airflow_janna_olli\project\rawdata\ENB'
 
-    p = os.path.join(conf_r, table + '.yaml')  # .replace(r"\\\\",r"/")
+    p = os.path.join(conf_r, table + '.yaml').replace(r"\\\\", r"/")
     with open(p) as f:
         documents = yaml.full_load(f)
     target_fields = documents[table]['tables'][table]['fields']

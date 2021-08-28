@@ -1,11 +1,10 @@
+import hashlib
 import os
 from datetime import datetime
 
 import pandas as pd
 import yaml
 from termcolor2 import colored
-
-
 
 try:
     from utils.DataVaultLoader import DataVaultLoader
@@ -31,6 +30,7 @@ class Transaktion:
         self.target = 'transaktion'
         self.schema_src = 'src'
         self.src_trans = 'trans'
+        self.load_domain = self.__class__.__name__.upper()
         if os.path.isdir(r'/Configs/ENB/'):
             self.conf_r = r'/Configs/ENB/'
         else:
@@ -41,10 +41,6 @@ class Transaktion:
     def join(self):
         trans = read_raw_sql_sat(db_con=self.db_com_src, date=self.date, schema=self.schema_src,
                                  t_name=self.src_trans)
-        # with open(self.conf_r + self.src_trans + '.yaml') as file:
-        #    documents = yaml.full_load(file)
-        # field_list = documents[self.src_trans]['tables'][self.src_trans]['fields']
-        # trans = trans[field_list]
         return trans
 
     def mapping(self, data: pd.DataFrame):
@@ -58,6 +54,8 @@ class Transaktion:
         sat_res_data['betrag'] = data['amount']
         sat_res_data['loeschung'] = 10
         sat_res_data['buchungsart'] = 1
+        sat_res_data['transaktion_hk'] = data['trans_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
+        sat_res_data['load_domain'] = self.load_domain
 
         lkp_cf_opperation = get_lkp_value(lkp_name='CF_OPERATION')
         lkp_payment_type = get_lkp_value(lkp_name='PAYMENT_TYPE')
@@ -72,10 +70,14 @@ class Transaktion:
     def writeToDB(self, data: pd.DataFrame):
         print(colored('INFO: Entity ' + self.target, color='green'))
 
-        loader = ILoader(date=self.date, loader_type='datavault', loading_sat='s_transaktion', loading_entity=self.target,
+        loader = ILoader(date=self.date, loader_type='datavault', loading_sat='s_transaktion',
+                         loading_entity=self.target,
                          target_connection=self.db_com_trg,
-                         schema=self.schema_trg)
+                         schema=self.schema_trg, build_hash_key=False, load_domain=self.load_domain)
         loader.load(data=data)
 
         print('--- Beladung Ende ---\n')
 
+
+konto = Transaktion('2018-12-31')
+konto.writeToDB(konto.mapping(konto.join()))

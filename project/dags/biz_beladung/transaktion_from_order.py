@@ -1,9 +1,14 @@
+import hashlib
+import logging
 import os
 from datetime import datetime
 
 import pandas as pd
 import yaml
 from termcolor2 import colored
+
+from project.dags.utils.ILoader import ILoader
+
 try:
     from utils.DataVaultLoader import DataVaultLoader
     from utils.TableReader import read_raw_sql_sat
@@ -18,7 +23,7 @@ except ImportError:
     from project.dags.utils.lookup import get_lkp_value
 
 
-class Transaktion:
+class ORDER:
     def __init__(self, date):
         self.date = date
         self.date_dt = datetime.strptime(date, '%Y-%m-%d')
@@ -26,6 +31,8 @@ class Transaktion:
         self.target = 'transaktion'
         self.schema_src = 'src'
         self.src_order = 'order'
+        self.src_acct = 'acct'
+        self.load_domain = self.__class__.__name__.upper()
         if os.path.isdir(r'/Configs/ENB/'):
             self.conf_r = r'/Configs/ENB/'
         else:
@@ -34,41 +41,49 @@ class Transaktion:
     def join(self):
         trans = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
                                  t_name=self.src_order)
-        with open(self.conf_r + self.src_order + '.yaml') as file:
-            documents = yaml.full_load(file)
-        field_list = documents[self.src_order]['tables'][self.src_order]['fields']
-        trans = trans[field_list]
-        return trans
+        acct = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
+                                 t_name=self.src_acct)
+        data = trans.merge(acct,how='left',on='account_id',suffixes=('','_'))
+
+
+        return data
 
     def mapping(self, data: pd.DataFrame):
         with open(self.conf_r + self.target + '.yaml') as file:
             documents = yaml.full_load(file)
+            print("mapping")
         sat_target_fields = documents[self.target]['tables']['s_' + self.target]['fields']
         sat_res_data = pd.DataFrame(columns=sat_target_fields)
-
         sat_res_data['transaktions_id'] = data['order_id']
-        #sat_res_data['ausfuehrungsdatum'] = data['fulldate'].apply(lambda x: datetime.strptime(x,'%d.%m.%Y').date())
-        sat_res_data['betrag'] = data['amount'].apply(lambda x: float(x.replace(',','.')))
+        sat_res_data['ausfuehrungsdatum'] = data['parseddate']
+        sat_res_data['betrag'] = data['amount']
         sat_res_data['loeschung'] = 10
         sat_res_data['buchungsart'] = 2
         sat_res_data['operation'] = 5
-        sat_res_data['payment_type'] = data['k_symbol'].apply(lambda x: get_lkp_value(lkp_name='payment_type',lkp_value=x )  )
+        sat_res_data['transaktion_hk'] = data['order_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
+        lkp = get_lkp_value(lkp_name='payment_type')
+        sat_res_data['payment_type'] = data['k_symbol'].apply(
+            lambda x: lkp[x])
+        sat_res_data['load_domain'] = self.load_domain
+        print("mapping done")
         return sat_res_data
 
     def writeToDB(self, data: pd.DataFrame):
-        print(colored('INFO: Entity ' + self.target, color='green'))
-        con = connect_to_db(layer=self.schema_trg)
-        sat_data = add_technical_col(data=data, t_name="s_transaktion", date=self.date, entity_name=self.target)
-        with open(self.conf_r + self.target + '.yaml') as file:
-            documents = yaml.full_load(file)
-        hub_target_fields = documents[self.target]['tables']['h_' + self.target]['fields']
-        hub_res_data = pd.DataFrame(columns=hub_target_fields)
-        hub_res_data[hub_target_fields] = sat_data[hub_target_fields]
 
-        dv_sat = DataVaultLoader(data=sat_data, db_con=con, entity_name=self.target, t_name='s_transaktion',
-                                 date=self.date, schema=self.schema_trg)
-        dv_hub = DataVaultLoader(data=hub_res_data, db_con=con, entity_name=self.target, t_name='h_transaktion',
-                                 date=self.date, schema=self.schema_trg)
-        dv_sat.load
-        dv_hub.load
+        logging.info(colored('INFO: Entity ' + self.target, color='green'))
+
+        con = connect_to_db(layer=self.schema_trg)
+
+        loader = ILoader(date=self.date, loader_type='datavault',
+                         loading_sat='s_transaktion',
+                         loading_entity=self.target,
+                         target_connection=con,
+                         schema=self.schema_trg, build_hash_key=False,load_domain=self.load_domain)
+        loader.load(data=data)
+
+
         print('--- Beladung Ende ---\n')
+
+
+konto = ORDER('2018-12-31')
+konto.writeToDB(konto.mapping(konto.join()))

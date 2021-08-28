@@ -10,7 +10,7 @@ except ImportError:
 def get_lkp_value(lkp_name: str):
     db_con = connect_to_db(layer='biz')
 
-    res = pd.read_sql_table(table_name=lkp_name,con=db_con)
+    res = pd.read_sql_table(table_name=lkp_name.upper(),con=db_con)
     results = res.to_dict('records')
 
     lkp = {}

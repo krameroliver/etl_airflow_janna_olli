@@ -1,7 +1,5 @@
 import pandas as pd
 
-
-
 try:
     from utils.DataVaultLoader import DataVaultLoader
     from utils.TableReader import read_raw_sql_sat
@@ -22,9 +20,10 @@ except ImportError:
 
 class KreditReport:
 
-    def __init__(self,p_date: str=None):
+    def __init__(self, p_date: str = None):
         self.p_date = p_date
 
+    @property
     def join_data(self):
         re_darlehen = ReadEntity(p_date=self.p_date, layer='biz', entity_name='darlehen')
         darlehen = re_darlehen.read_entity
@@ -38,15 +37,20 @@ class KreditReport:
         darlehen_konto = ReadEntity(p_date=self.p_date, layer='biz', entity_name='darlehen_konto').read_entity
         gp_konto = ReadEntity(p_date=self.p_date, layer='biz', entity_name='gp_konto').read_entity
 
-        data = darlehen.merge(darlehen_konto,how='inner',on='darlehen_hk').merge(konto,how='inner',on='konto_hk').merge(gp_konto,how='inner',on='konto_hk').merge(gp,how='inner',on='geschaeftspartner_hk')
+        data = darlehen.merge(darlehen_konto, how='inner', on='darlehen_hk').merge(
+            konto, how='inner',
+            on='konto_hk').merge(gp_konto,
+                                 how='inner',
+                                 on='konto_hk').merge(
+            gp, how='inner', on='geschaeftspartner_hk')
 
-        print(data.head())
+        return data
 
     def write_report(self, data: pd.DataFrame):
-        json_data = data.to_dict('records')
-        loader = ILoader(date=self.p_date,loader_type='MONGO',report_name='KreditReport',bi_departement='PoeticDrunkenCat')
-        loader.load(json_data)
+        loader = ILoader(date=self.p_date, loader_type='MONGO', report_name='KreditReport',
+                         bi_departement='PoeticDrunkenCat', load_domain=self.__class__.__name__)
+        loader.load(data)
 
 
 report = KreditReport(p_date='2018-12-31')
-report.join_data()
+report.write_report(report.join_data)

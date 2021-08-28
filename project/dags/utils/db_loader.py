@@ -25,8 +25,8 @@ def element_is_not_in(comparelist, element):
 
 
 class LoadtoDB():
-    def __init__(self, data: pd.DataFrame, db_con, t_name, date: str = None, schema: str = None,
-                 commit_size: int = 10000, entityName: str = None, useSingeFetch=False, t_type=None):
+    def __init__(self, data: pd.DataFrame, db_con, t_name, load_domain: str, date: str = None, schema: str = None,
+                 commit_size: int = 10000, entityName: str = None, useSingeFetch=False):
         '''
 
         :param data: Data that should write to Database
@@ -42,6 +42,7 @@ class LoadtoDB():
         self.db_con = db_con
         self.t_name = t_name
         self.schema = schema
+        self.load_domain = load_domain
         self.commit_size = commit_size
         self.target_table = None
         self.entityName = entityName
@@ -55,7 +56,7 @@ class LoadtoDB():
             conf_r = r'/Configs/ENB/'
         else:
             conf_r = r'../Configs/ENB/'
-
+        print("DbLoader")
         if entityName == None:
             with open(conf_r + t_name + '.yaml') as file:
                 self.documents = yaml.full_load(file)
@@ -77,8 +78,15 @@ class LoadtoDB():
                 if self.hk in c.name:
                     col = c
 
-        stmt = 'select {0} from {1}.{2}'.format(self.hk, self.schema, self.t_name)
-        table_hk = list(db_con.execute(stmt).fetchall())
+        try:
+            stmt = "select {0} from {1}.{2} where load_domain='{3}'".format(self.hk, self.schema, self.t_name,
+                                                                        self.load_domain)
+            table_hk = list(db_con.execute(stmt).fetchall())
+        except:
+            stmt = "select {0} from {1}.{2}".format(self.hk, self.schema, self.t_name)
+            table_hk = list(db_con.execute(stmt).fetchall())
+
+
         table_hk = [i[0] for i in table_hk]
         df_hk = list(self.data[self.hk])
 
@@ -100,15 +108,14 @@ class LoadtoDB():
 
         updt_khs['hks'] = updt_khs['df_hk']
         self.update_hk = updt_khs
-        updt_khs.drop(['df_hk', 'table_hk'], axis=1)
-
+        self.update_hk = updt_khs.drop(['df_hk', 'table_hk'], axis=1)
         self.insert_df = data.merge(insrt_khs, how='inner', left_on=self.hk, right_on='hks')
         self.insert_df.drop(['hks'], axis=1)
 
         self.delete_df = data.merge(del_khs, how='inner', left_on=self.hk, right_on='hks')
         self.delete_df.drop(['hks'], axis=1)
 
-        self.update_df = data.merge(insrt_khs, how='inner', left_on=self.hk, right_on='hks')
+        self.update_df = data.merge(self.update_hk, how='inner', left_on=self.hk, right_on='hks')
         self.update_df.drop(['hks'], axis=1)
 
         del (insrt_khs, del_khs, updt_khs, table_hk_df, df_hk_df)
@@ -122,18 +129,15 @@ class LoadtoDB():
         return repr_str
 
     def insert(self):
+        print("Insert")
         conn = self.db_con.connect()
         self.insert_df.drop_duplicates(inplace=True)
-
+        self.insert_df = self.insert_df[self.insert_df[self.hk].notna()]
         if self.insert_df.shape[0] > 0:
 
             self.insert_df['processing_date_start'] = self.processing_date_start
-            _f = self.fields
-            _f.append(self.hk)
-            _f.extend(tech_fields)
-            self.insert_df = self.insert_df[_f]
             _anz = 1
-            record_list = self.insert_df.to_dict('record')
+            record_list = self.insert_df.to_dict('records')
             chunks = list(divide_chunks(record_list, self.commit_size))
             for i in chunks:
                 self.target_table.name = self.t_name
@@ -143,14 +147,14 @@ class LoadtoDB():
             print('Nichts zu inserten')
 
     def delete(self):
-
+        print("Delete")
         if self.delete_df.shape[0] > 0:
             conn = self.db_con.connect()
             conn.close()
         else:
             print('Nichts zu loeschen')
 
-    def vergelich(self, x):
+    def compare(self, x):
         if x["diff_hk"] == self.diff_hk_lkp[x[self.hk]]:
             return 1
         else:
@@ -208,8 +212,8 @@ class LoadtoDB():
         return old_data
 
     def update_v2(self):
+        print("Update")
         fields = list(self.fields)
-
         if len(self.update_df[self.hk]) > 0:
             conn = self.db_con.connect()
             old_data = self.get_old_data()
@@ -251,7 +255,7 @@ class LoadtoDB():
 
                     stmt3 = "UPDATE " + self.schema + "." + self.target_table.name + " FOR PORTION OF business_time FROM '" + self.processing_date_start + "' TO '2262-04-11' SET " + set_part + ", mod_flg = 'U'  WHERE " + self.hk + " = '" + u_hk + "';"
                     chunk_stmt.append(stmt3)
-                st = ';'.join(chunk_stmt)+";"
+                st = ';'.join(chunk_stmt) + ";"
                 conn.execute(st)
 
                 conn.execute('commit')

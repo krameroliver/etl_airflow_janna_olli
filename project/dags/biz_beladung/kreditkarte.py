@@ -1,9 +1,11 @@
+import hashlib
 import os
 from datetime import datetime
 
 import pandas as pd
 import yaml
 from termcolor2 import colored
+
 try:
     from utils.DataVaultLoader import DataVaultLoader
     from utils.TableReader import read_raw_sql_sat
@@ -26,15 +28,17 @@ class Kreditkarte:
         self.target = 'kreditkarte'
         self.schema_src = 'src'
         self.src_card = 'card'
+        self.load_domain = self.__class__.__name__.upper()
         if os.path.isdir(r'/Configs/ENB/'):
             self.conf_r = r'/Configs/ENB/'
         else:
             self.conf_r = r'../Configs/ENB/'
 
+    @property
     def join(self):
         card = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
                                 t_name=self.src_card)
-        with open(self.conf_r  + self.src_card + '.yaml') as file:
+        with open(self.conf_r + self.src_card + '.yaml') as file:
             documents = yaml.full_load(file)
         field_list = documents[self.src_card]['tables'][self.src_card]['fields']
         card = card[field_list]
@@ -49,7 +53,7 @@ class Kreditkarte:
         return lkp[type]
 
     def mapping(self, data: pd.DataFrame):
-        with open(self.conf_r  + self.target + '.yaml') as file:
+        with open(self.conf_r + self.target + '.yaml') as file:
             documents = yaml.full_load(file)
         sat_target_fields = documents[self.target]['tables']['s_' + self.target]['fields']
         sat_res_data = pd.DataFrame(columns=sat_target_fields)
@@ -58,6 +62,8 @@ class Kreditkarte:
         sat_res_data['beginndatum'] = data['fulldate']
         sat_res_data['kartentyp'] = data['card_type'].apply(lambda x: self.lkp_cardtype(x))
         sat_res_data['loeschung'] = 10
+        sat_res_data['load_domain'] = self.load_domain
+        sat_res_data['kreditkarte_hk'] = data['card_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
 
         return sat_res_data
 
@@ -69,9 +75,11 @@ class Kreditkarte:
                          loading_sat='s_kreditkarte',
                          loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg)
+                         schema=self.schema_trg, build_hash_key=False, load_domain=self.load_domain)
         loader.load(data=data)
-
 
         print('--- Beladung Ende ---\n')
 
+
+konto = Kreditkarte('2018-12-31')
+konto.writeToDB(konto.mapping(konto.join))

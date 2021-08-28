@@ -25,13 +25,13 @@ except ImportError:
 
 class Ko:
     def __init__(self, date):
-
         self.date = date
         self.date_dt = datetime.strptime(date, '%Y-%m-%d')
         self.schema_trg = 'biz'
         self.target = 'konto'
         self.schema_src = 'src'
         self.src_acct = 'acct'
+        self.load_domain = self.__class__.__name__.upper()
         self.src_trans = 'trans'
         if os.path.isdir(r'/Configs/ENB/'):
             self.conf_r = r'/Configs/ENB/'
@@ -78,6 +78,7 @@ class Ko:
         out_data['kontoerstellung_dt'] = data['parseddate']
         out_data['wertstellungszeitpunkt'] = data['fulldatewithtime']
         out_data['kontostand'] = data['balance']
+        out_data['load_domain'] = self.load_domain
         out_data['konto_hk'] = data['account_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
 
         return out_data
@@ -86,7 +87,7 @@ class Ko:
         con = connect_to_db(layer=self.schema_trg)
         loader = ILoader(date=self.date,loader_type='datavault', loading_sat='s_konto', loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg)
+                         schema=self.schema_trg,build_hash_key=False,load_domain=self.load_domain)
         loader.load(data=data)
 
 

@@ -69,6 +69,28 @@ x-airflow-common:
       condition: service_healthy
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
+  CoreDB:
+    image: linuxserver/mariadb
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_ROOT_PASSWORD=123456
+      - TZ=Europe/Berlin
+    volumes:
+      - mariadb-db-volume:/var/lib/mariadb/data
+    ports:
+      - 3306:3306
+    restart: always
 
   postgres:
     image: postgres:13
@@ -143,3 +165,4 @@ services:
 
 volumes:
   postgres-db-volume:
+  mariadb-db-volume:

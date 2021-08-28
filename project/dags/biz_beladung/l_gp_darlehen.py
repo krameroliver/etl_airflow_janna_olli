@@ -27,6 +27,7 @@ class Link_GP_DARLEHEN:
         self.date_dt = datetime.strptime(date, '%Y-%m-%d')
         self.schema_trg = 'biz'
         self.target = 'gp_darlehen'
+        self.load_domain = self.__class__.__name__.upper()
         self.schema_src = 'src'
         self.src_loan = 'loan'
         self.src_acct = 'acct'
@@ -39,7 +40,7 @@ class Link_GP_DARLEHEN:
 
     def join(self):
         client = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
-                                t_name=self.src_client)
+                                  t_name=self.src_client)
 
         disp = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
                                 t_name=self.src_disp)
@@ -47,20 +48,29 @@ class Link_GP_DARLEHEN:
         loan = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
                                 t_name=self.src_loan)
 
-
         acct = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
                                 t_name=self.src_acct)
 
-        out_data = client.merge(disp, how='inner', left_on='client_id', right_on='client_id', suffixes=('', '_disp')).merge(acct,how='inner',left_on='account_id',right_on='account_id',suffixes=('','_acct')).merge(loan,how='inner',left_on='account_id',right_on='account_id',suffixes=('','_loan'))
-        out_data = out_data[['loan_id','client_id']]
+        out_data = client.merge(disp, how='inner', left_on='client_id', right_on='client_id',
+                                suffixes=('', '_disp')).merge(acct, how='inner', left_on='account_id',
+                                                              right_on='account_id', suffixes=('', '_acct')).merge(loan,
+                                                                                                                   how='inner',
+                                                                                                                   left_on='account_id',
+                                                                                                                   right_on='account_id',
+                                                                                                                   suffixes=(
+                                                                                                                   '',
+                                                                                                                   '_loan'))
+        out_data = out_data[['loan_id', 'client_id']]
         out_data = out_data[out_data.notnull()]
         return out_data
 
-    def mapping(self,data:pd.DataFrame):
+    def mapping(self, data: pd.DataFrame):
         out_data = pd.DataFrame()
         out_data['darlehen_hk'] = data['loan_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
-        out_data['geschaeftspartner_hk'] = data['client_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
+        out_data['geschaeftspartner_hk'] = data['client_id'].apply(
+            lambda x: hashlib.md5(x.encode()).hexdigest().upper())
         out_data['help_str'] = out_data.astype(str).agg(''.join, axis=1)
+        out_data['load_domain'] = self.load_domain
         out_data['gp_darlehen_hk'] = out_data['help_str'].apply(
             lambda x: hashlib.md5(x.encode()).hexdigest().upper())
         out_data.drop(inplace=True, columns='help_str')
@@ -75,7 +85,7 @@ class Link_GP_DARLEHEN:
                          loading_sat='l_s_gp_darlehen',
                          loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg)
+                         schema=self.schema_trg, build_hash_key=True, load_domain=self.load_domain)
         loader.load(data=data)
 
         logging.info('--- Beladung Ende ---\n')

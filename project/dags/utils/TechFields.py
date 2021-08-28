@@ -19,8 +19,8 @@ def add_technical_col(data: pd.DataFrame, t_name: str, date: str = None, entity_
         entity = entity_name
 
     fields = documents[entity]['tables'][t_name]['fields']
-    data = data[fields]
-    data['diff_str'] = data.astype(str).agg('|'.join, axis=1)
+    _data = data[fields]
+    data['diff_str'] = _data.astype(str).agg('|'.join, axis=1)
     data["diff_hk"] = data['diff_str'].astype(str).apply(
         lambda x: hashlib.md5(x.encode()).hexdigest().upper())
     data.drop(inplace=True, columns='diff_str')

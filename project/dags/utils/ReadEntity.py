@@ -1,10 +1,7 @@
 import os
-from datetime import datetime
 
-import pandas as pd
 import yaml
 from termcolor2 import colored
-import unittest
 
 try:
     from utils.TableReader import read_raw_sql_sat as r_sat
@@ -67,11 +64,17 @@ class ReadEntity:
                 if self.config[self.entity_name]['tables'][t]['table_type'] == 'hub' or \
                         self.config[self.entity_name]['tables'][t]['table_type'] == 'link':
                     entity = r_hub(date=self.p_date, t_name=t, db_con=con, schema=self.layer)
+                    entity.drop(columns=['index'], inplace=True)
                 elif self.config[self.entity_name]['tables'][t]['table_type'] == 'satellit':
-                    dataframes[t] = r_sat(date=self.p_date, t_name=t, db_con=con, schema=self.layer)
+                    _r_sat = r_sat(date=self.p_date, t_name=t, db_con=con, schema=self.layer)
+                    _r_sat.drop(
+                        columns=['index', 'processing_date_start', 'processing_date_end', 'createte_at', 'modified_at',
+                                 'record_source', 'diff_hk', 'mod_flg', 'load_domain'], inplace=True)
+                    dataframes[t] = _r_sat
 
             for k, v in dataframes.items():
                 entity = entity.merge(v, how='left', on=hk, suffixes=('', '_' + k))
+
             return entity
         else:
             return None

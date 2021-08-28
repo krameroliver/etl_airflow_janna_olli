@@ -29,10 +29,10 @@ class dynamic_lkp:
         self.lkp_data = pd.DataFrame(columns=['auspraegung', 'ID'], data={'ID': ids, 'auspraegung': data})
 
 
-    def post_lkp(self,tablename: str, lookup_name: str, column: str):
+    def post_lkp(self,tablename: str, lookup_name: str, column: str,if_exists:str='replace'):
         self.build_lkp(column=column,tablename=tablename)
         db_con_biz = connect_to_db(layer='biz')
         metadata = MetaData(bind=db_con_biz)
         metadata.reflect(bind=db_con_biz, schema='biz')
-        self.lkp_data.to_sql(schema='biz', con=db_con_biz, if_exists='replace', name=lookup_name.upper(),
+        self.lkp_data.to_sql(schema='biz', con=db_con_biz, if_exists=if_exists, name=lookup_name.upper(),
                              index=False)

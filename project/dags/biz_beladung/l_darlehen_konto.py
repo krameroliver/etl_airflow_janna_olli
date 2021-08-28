@@ -28,6 +28,7 @@ class Link_DARLEHEN_KONTO:
         self.target = 'darlehen_konto'
         self.schema_src = 'src'
         self.src_loan = 'loan'
+        self.load_domain = self.__class__.__name__.upper()
         self.src_acct = 'acct'
         if os.path.isdir(r'/Configs/ENB/'):
             self.conf_r = r'/Configs/ENB/'
@@ -52,6 +53,7 @@ class Link_DARLEHEN_KONTO:
         out_data['konto_hk'] = data['account_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
         out_data['help_str'] = out_data.astype(str).agg(''.join, axis=1)
         out_data['darlehen_konto_hk'] = out_data['help_str'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
+        out_data['load_domain'] = self.load_domain
         out_data.drop(inplace=True, columns='help_str')
 
         return out_data
@@ -63,7 +65,7 @@ class Link_DARLEHEN_KONTO:
                          loading_sat='l_s_darlehen_konto',
                          loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg)
+                         schema=self.schema_trg,build_hash_key=True,load_domain=self.load_domain)
         loader.load(data=data)
 
         logging.info('--- Beladung Ende ---\n')

@@ -8,7 +8,6 @@ pandasql
 termcolor2
 pymysql
 apache-airflow
-pandas-upsert-to-mysql
 connection
 stem
 PyYaml
@@ -17,3 +16,9 @@ marquez-airflow
 sshtunnel
 swifter
 pykeepass
+matplotlib
+statsmodels
+seaborn
+scikit-learn
+pika
+pmdarima

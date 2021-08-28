@@ -15,13 +15,14 @@ except ImportError:
 
 class DataVaultLoader:
 
-    def __init__(self, data: pd.DataFrame, db_con, entity_name: str, t_name: str, date: str = None, schema: str = None,
+    def __init__(self, data: pd.DataFrame, db_con, entity_name: str,load_domain:str, t_name: str, date: str = None, schema: str = None,
                  commit_size: int = 10000, useSingeFetch: bool = False):
         self.data = data
         self.db_con = db_con
         self.entity_name = entity_name
         self.t_name = t_name
         self.date = date
+        self.load_domain = load_domain
         self.schema = schema
         self.commit_size = commit_size
         self.target_table = None
@@ -34,10 +35,10 @@ class DataVaultLoader:
         with open(conf) as file:
             self.documents = yaml.full_load(file)
         self.table_type = self.documents[entity_name]['tables'][self.t_name]['table_type']
-
+        print("Build Loader")
         self.Loader = LoadtoDB(data=self.data, db_con=self.db_con, t_name=self.t_name, date=self.date,
                                schema=self.schema, commit_size=self.commit_size, entityName=self.entity_name,
-                               useSingeFetch=True, t_type=self.table_type)
+                               useSingeFetch=True,load_domain=self.load_domain)
 
     @property
     def load(self):
@@ -51,7 +52,7 @@ class DataVaultLoader:
             print(colored('ERROR:', color='red') + ' Kein Zulaessiger Tabellen-Typ gefunden')
 
     def satellit(self):
-        #self.Loader.update_v2()
+        self.Loader.update_v2()
         self.Loader.insert()
         self.Loader.delete()
 

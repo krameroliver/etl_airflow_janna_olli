@@ -21,7 +21,7 @@ PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(gp_darlehen_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
----------------------------------
+                                 
 
 CREATE TABLE biz.l_trans_konto(
 trans_konto_hk CHAR(32),
@@ -47,7 +47,7 @@ PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(trans_konto_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
----------------------------------
+                                 
 
 CREATE TABLE biz.l_darlehen_konto(
 darlehen_konto_hk CHAR(32),
@@ -72,7 +72,7 @@ PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(darlehen_konto_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
----------------------------------
+                                 
 
 
 CREATE TABLE biz.l_gp_konto(
@@ -99,7 +99,7 @@ PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(gp_konto_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
----------------------------------
+                                 
 
 CREATE TABLE biz.l_gp_cc(
 gp_cc_hk CHAR(32),
@@ -124,7 +124,7 @@ PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(gp_cc_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
----------------------------------
+                                 
 
 
 
@@ -153,7 +153,7 @@ PRIMARY KEY(cc_konto_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
 
-----------------------------------------
+                                        
 
 CREATE TABLE biz.h_konto(
 kontonummer VARCHAR(18),
@@ -178,7 +178,7 @@ PERIOD FOR system_time(createte_at, modified_at),
 PRIMARY KEY(konto_hk,processing_date_end)
 )WITH SYSTEM VERSIONING;
 
-----------------------------------------
+                                        
 CREATE TABLE biz.h_geschaeftspartner(
 kundennummer VARCHAR(18),
 geschaeftspartner_hk CHAR(32),

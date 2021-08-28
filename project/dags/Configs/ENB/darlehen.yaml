@@ -2,7 +2,7 @@ darlehen:
   tables:
     s_darlehen:
       fields:
-        - 'kontonummer'
+        - 'darlehensnummer'
         - 'nominal'
         - 'startdatum'
         - 'enddatum'
@@ -22,15 +22,15 @@ darlehen:
         - 'str'
         - 'str'
       businesskeys:
-        - 'kontonummer'
+        - 'darlehensnummer'
       layer: 'biz'
       hash_key: 'darlehen_hk'
       table_type: 'satellit'
     h_darlehen:
       fields:
-        - 'kontonummer'
+        - 'darlehensnummer'
       businesskeys:
-        - 'kundennummer'
+        - 'darlehensnummer'
       layer: 'biz'
       hash_key: 'darlehen_hk'
       table_type: 'hub'

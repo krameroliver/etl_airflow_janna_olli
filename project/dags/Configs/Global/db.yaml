@@ -1,14 +1,12 @@
 database:
   CoreDWH:
-    #user: dbuser #postgres
-    #password: 123456
+
     port: 3306 #5432
     db_name: CoreDWH
     host: 127.0.0.1  #VPN IP NAS
     type: mariadb # postgres
     sshhost: 82.165.203.114
-    #sshuser: root
-    #sshpw: Z4ykW#&q*5
+
     useSSH: False
     main: PoeticDrunkenCat
   MongoDB:
