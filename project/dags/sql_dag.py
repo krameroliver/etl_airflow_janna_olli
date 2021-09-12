@@ -2,10 +2,11 @@ import os
 
 from airflow import DAG
 from airflow.lineage import LineageBackend
+from dwhutils.db_connection import connect_to_db
 from sqlalchemy import MetaData
 
 from sqlalchemy import text
-from utils.db_connection import connect_to_db
+
 from airflow.operators.python_operator import PythonOperator
 
 default_arg = {'owner': 'airflow', 'start_date': '2021-06-20'}

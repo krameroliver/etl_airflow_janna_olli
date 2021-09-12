@@ -1,5 +1,8 @@
-from utils.ReadEntity import ReadEntity
-
+from dwhutils.ReadEntity import ReadEntity
+#try:
+#    from utils.ReadEntity import ReadEntity
+#except ImportError:
+#    from project.dags.utils.ReadEntity import ReadEntity
 
 import pandas as pd
 import os
@@ -33,4 +36,4 @@ class PredictionExport:
         exportdata = self.mapping
         exportdata.to_csv(path_or_buf=self.out_path,sep='\t')
 
-report=PredictionExport().export
+report=PredictionExport('2018-12-31').export

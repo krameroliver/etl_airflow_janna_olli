@@ -7,20 +7,12 @@ from datetime import datetime
 
 import pandas as pd
 
+from dateutil.relativedelta import relativedelta
+from dwhutils.ILoader import ILoader
+from dwhutils.TableReader import read_raw_sql_sat
+from dwhutils.db_connection import connect_to_db
 
 
-try:
-    from utils.DataVaultLoader import DataVaultLoader
-    from utils.TableReader import read_raw_sql_sat
-    from utils.TechFields import add_technical_col
-    from utils.db_connection import connect_to_db
-    from utils.ILoader import ILoader
-except ImportError:
-    from project.dags.utils.TableReader import read_raw_sql_sat
-    from project.dags.utils.db_connection import connect_to_db
-    from project.dags.utils.TechFields import add_technical_col
-    from project.dags.utils.DataVaultLoader import DataVaultLoader
-    from project.dags.utils.ILoader import ILoader
 
 
 class Ko:
@@ -33,10 +25,7 @@ class Ko:
         self.src_acct = 'acct'
         self.load_domain = self.__class__.__name__.upper()
         self.src_trans = 'trans'
-        if os.path.isdir(r'/Configs/ENB/'):
-            self.conf_r = r'/Configs/ENB/'
-        else:
-            self.conf_r = r'../Configs/ENB/'
+        self.conf_r = os.getenv('ENTITY_CONFIGS')
 
     def join(self):
         account = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,

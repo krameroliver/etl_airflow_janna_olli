@@ -5,19 +5,11 @@ from datetime import datetime
 import pandas as pd
 import yaml
 from termcolor2 import colored
+from dwhutils.ILoader import ILoader
+from dwhutils.TableReader import read_raw_sql_sat
+from dwhutils.db_connection import connect_to_db
 
-try:
-    from utils.DataVaultLoader import DataVaultLoader
-    from utils.TableReader import read_raw_sql_sat
-    from utils.TechFields import add_technical_col
-    from utils.db_connection import connect_to_db
-    from utils.ILoader import ILoader
-except ImportError:
-    from project.dags.utils.DataVaultLoader import DataVaultLoader
-    from project.dags.utils.TableReader import read_raw_sql_sat
-    from project.dags.utils.TechFields import add_technical_col
-    from project.dags.utils.db_connection import connect_to_db
-    from project.dags.utils.ILoader import ILoader
+
 
 
 class Kreditkarte:
@@ -29,16 +21,15 @@ class Kreditkarte:
         self.schema_src = 'src'
         self.src_card = 'card'
         self.load_domain = self.__class__.__name__.upper()
-        if os.path.isdir(r'/Configs/ENB/'):
-            self.conf_r = r'/Configs/ENB/'
-        else:
-            self.conf_r = r'../Configs/ENB/'
+        self.conf_r = os.getenv('ENTITY_CONFIGS')
+        self.src_dok = os.path.join(self.conf_r , self.src_card + '.yaml')
+        self.trg_dok = os.path.join(self.conf_r, self.target + '.yaml')
 
     @property
     def join(self):
         card = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
                                 t_name=self.src_card)
-        with open(self.conf_r + self.src_card + '.yaml') as file:
+        with open(self.src_dok ) as file:
             documents = yaml.full_load(file)
         field_list = documents[self.src_card]['tables'][self.src_card]['fields']
         card = card[field_list]
@@ -53,7 +44,7 @@ class Kreditkarte:
         return lkp[type]
 
     def mapping(self, data: pd.DataFrame):
-        with open(self.conf_r + self.target + '.yaml') as file:
+        with open(self.trg_dok) as file:
             documents = yaml.full_load(file)
         sat_target_fields = documents[self.target]['tables']['s_' + self.target]['fields']
         sat_res_data = pd.DataFrame(columns=sat_target_fields)
@@ -81,5 +72,5 @@ class Kreditkarte:
         print('--- Beladung Ende ---\n')
 
 
-konto = Kreditkarte('2018-12-31')
-konto.writeToDB(konto.mapping(konto.join))
+#konto = Kreditkarte('2018-12-31')
+#konto.writeToDB(konto.mapping(konto.join))

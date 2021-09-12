@@ -14,3 +14,5 @@ RUN pip install pymysql
 RUN pip install sshtunnel
 RUN pip install pykeepass
 RUN pip install swifter
+RUN pip install python-dotenv
+RUN pip install dwhutils==0.1.9

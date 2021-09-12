@@ -1,12 +1,10 @@
 database:
   CoreDWH:
-
     port: 3306 #5432
     db_name: CoreDWH
-    host: 127.0.0.1  #VPN IP NAS
+    host: coredb
     type: mariadb # postgres
     sshhost: 82.165.203.114
-
     useSSH: False
     main: PoeticDrunkenCat
   MongoDB:

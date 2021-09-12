@@ -7,19 +7,9 @@ from attr._make import _has_own_attribute
 from termcolor import colored
 import logging
 
-try:
-    from utils.DataVaultLoader import DataVaultLoader
-    from utils.TableReader import read_raw_sql_sat
-    from utils.TechFields import add_technical_col
-    from utils.db_connection import connect_to_db
-    from utils.ILoader import ILoader
-except ImportError:
-    from project.dags.utils.DataVaultLoader import DataVaultLoader
-    from project.dags.utils.TableReader import read_raw_sql_sat
-    from project.dags.utils.TechFields import add_technical_col
-    from project.dags.utils.db_connection import connect_to_db
-    from project.dags.utils.ILoader import ILoader
-
+from dwhutils.ILoader import ILoader
+from dwhutils.TableReader import read_raw_sql_sat
+from dwhutils.db_connection import connect_to_db
 
 class Link_GP_DARLEHEN:
     def __init__(self, date):

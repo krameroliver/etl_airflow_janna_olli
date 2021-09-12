@@ -2,10 +2,9 @@ import logging
 
 import pandas as pd
 
-try:
-    from utils.db_connection import connect_to_db
-except ImportError:
-    from project.dags.utils.db_connection import connect_to_db
+from dwhutils.ILoader import ILoader
+from dwhutils.TableReader import read_raw_sql_sat
+from dwhutils.db_connection import connect_to_db
 
 
 class lookup:

@@ -6,21 +6,25 @@ import os
 from datetime import datetime
 
 import pandas as pd
-import yaml
 from dateutil.relativedelta import relativedelta
+from dwhutils.ILoader import ILoader
+from dwhutils.TableReader import read_raw_sql_sat
+from dwhutils.db_connection import connect_to_db
 from termcolor2 import colored
-try:
-    from utils.DataVaultLoader import DataVaultLoader
-    from utils.TableReader import read_raw_sql_sat
-    from utils.TechFields import add_technical_col
-    from utils.db_connection import connect_to_db
-    from utils.ILoader import ILoader
-except ImportError:
-    from project.dags.utils.DataVaultLoader import DataVaultLoader
-    from project.dags.utils.TableReader import read_raw_sql_sat
-    from project.dags.utils.TechFields import add_technical_col
-    from project.dags.utils.db_connection import connect_to_db
-    from project.dags.utils.ILoader import ILoader
+
+
+# try:
+#    from utils.DataVaultLoader import DataVaultLoader
+#    from utils.TableReader import read_raw_sql_sat
+#    from utils.TechFields import add_technical_col
+#    from utils.db_connection import connect_to_db
+#    from utils.ILoader import ILoader
+# except ImportError:
+#    from project.dags.utils.DataVaultLoader import DataVaultLoader
+#    from project.dags.utils.TableReader import read_raw_sql_sat
+#    from project.dags.utils.TechFields import add_technical_col
+#    from project.dags.utils.db_connection import connect_to_db
+#    from project.dags.utils.ILoader import ILoader
 
 class Gp:
     def __init__(self, date):
@@ -33,10 +37,9 @@ class Gp:
         self.src_disp = 'disposition'
         self.load_domain = self.__class__.__name__.upper()
         self.src_card = 'card'
-        if os.path.isdir(r'/Configs/ENB/'):
-            self.conf_r = r'/Configs/ENB/'
-        else:
-            self.conf_r = r'../Configs/ENB/'
+        self.conf_r = os.getenv('ENTITY_CONFIGS')
+        self.doc_src = os.path.join(self.conf_r, self.src_card + '.yaml')
+        self.doc_trg = os.path.join(self.conf_r, self.target + '.yaml')
 
     def join(self):
         client = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
@@ -60,7 +63,6 @@ class Gp:
         return avarage_years[sex]
 
     def mapping(self, data: pd.DataFrame):
-
         out_data = pd.DataFrame()
         out_data['kundennummer'] = data['client_id']
         out_data['sozialversicherungsnummer'] = data['social']
@@ -80,7 +82,8 @@ class Gp:
         counts = data.groupby(by=['client_id']).size().reset_index(name='counts')
         data = data.merge(counts, how='left', left_on='client_id', right_on='client_id')
         out_data['kreditkartenanzahl'] = data['counts']
-        out_data['geschaeftspartner_hk'] = data['client_id'].apply(lambda x: hashlib.md5(x.encode()).hexdigest().upper())
+        out_data['geschaeftspartner_hk'] = data['client_id'].apply(
+            lambda x: hashlib.md5(x.encode()).hexdigest().upper())
 
         return out_data
 
@@ -157,9 +160,8 @@ class Gp:
                          loading_sat='s_geschaeftspartner',
                          loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg,load_domain=self.load_domain)
+                         schema=self.schema_trg, load_domain=self.load_domain)
         loader.load(data=data)
-
 
         print('--- Beladung Ende ---\n')
 
@@ -167,10 +169,11 @@ class Gp:
         print(colored('INFO: Entity ' + self.target, color='green'))
         con = connect_to_db(layer=self.schema_trg)
 
-        loader = ILoader(date=self.date, loader_type='datavault', loading_sat='s_geschaeftspartner_postalische_addresse',
+        loader = ILoader(date=self.date, loader_type='datavault',
+                         loading_sat='s_geschaeftspartner_postalische_addresse',
                          loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg,load_domain=self.load_domain)
+                         schema=self.schema_trg, load_domain=self.load_domain)
         loader.load(data=data)
 
         print('--- Beladung Ende ---\n')
@@ -178,20 +181,20 @@ class Gp:
     def writeToDB_digitale_add(self, data: pd.DataFrame):
         print(colored('INFO: Entity ' + self.target, color='green'))
         con = connect_to_db(layer=self.schema_trg)
-        loader = ILoader(date=self.date, loader_type='datavault', loading_sat='m_geschaeftspartner_digitale_addresse', loading_entity=self.target,
+        loader = ILoader(date=self.date, loader_type='datavault', loading_sat='m_geschaeftspartner_digitale_addresse',
+                         loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg,load_domain=self.load_domain)
+                         schema=self.schema_trg, load_domain=self.load_domain)
         loader.load(data=data)
-
 
         print('--- Beladung Ende ---\n')
 
 
-entity = Gp(date='2018-12-31')
-entity.writeToDB(entity.mapping(entity.join()))
-
-entity = Gp(date='2018-12-31')
-entity.writeToDB_postalischeadd(entity.mapping_postalischeadresse(entity.join()))
-
-entity = Gp(date='2018-12-31')
-entity.writeToDB_digitale_add(entity.mapping_digitaleadresse(entity.join()))
+# entity = Gp(date='2018-12-31')
+# entity.writeToDB(entity.mapping(entity.join()))
+#
+# entity = Gp(date='2018-12-31')
+# entity.writeToDB_postalischeadd(entity.mapping_postalischeadresse(entity.join()))
+#
+# entity = Gp(date='2018-12-31')
+# entity.writeToDB_digitale_add(entity.mapping_digitaleadresse(entity.join()))

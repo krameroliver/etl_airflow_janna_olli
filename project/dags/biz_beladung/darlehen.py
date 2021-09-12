@@ -1,25 +1,16 @@
-import os
 import warnings
 from datetime import datetime
 
 import pandas as pd
 import yaml
+from dwhutils.Logger import logger
 
 warnings.filterwarnings("ignore")
 
-# try:
-from utils.TableReader import read_raw_sql_sat
-from utils.db_connection import connect_to_db
-from utils.ILoader import ILoader
-from Logger import logger
-
-
-# except ImportError:
-#    from project.dags.utils.DataVaultLoader import DataVaultLoader
-#    from project.dags.utils.TableReader import read_raw_sql_sat
-#    from project.dags.utils.TechFields import add_technical_col
-#    from project.dags.utils.db_connection import connect_to_db
-#    from project.dags.utils.ILoader import ILoader
+from dwhutils.TableReader import read_raw_sql_sat
+from dwhutils.db_connection import connect_to_db
+from dwhutils.ILoader import ILoader
+import os
 
 
 class Darlehen:
@@ -33,15 +24,16 @@ class Darlehen:
         self.schema_src = 'src'
         self.src_loan = 'loan'
         self.load_domain = self.__class__.__name__
-        if os.path.isdir(r'/Configs/ENB/'):
-            self.conf_r = r'/Configs/ENB/'
-        else:
-            self.conf_r = r'../Configs/ENB/'
+        self.conf_r = os.getenv('ENTITY_CONFIGS')
+        self.doc_src = os.path.join(self.conf_r, self.src_loan + '.yaml')
+        self.doc_trg = os.path.join(self.conf_r, self.target + '.yaml')
 
     def join(self):
-        _loan = read_raw_sql_sat(db_con=connect_to_db(layer=self.schema_src), date=self.date, schema=self.schema_src,
-                                 t_name=self.src_loan, lclass=self.load_domain, lcli=self.cli_log, lfile=self.file_log)
-        with open(self.conf_r + self.src_loan + '.yaml') as file:
+        con = connect_to_db(layer=self.schema_src)
+        print(con)
+        _loan = read_raw_sql_sat(db_con=con, date=self.date, schema=self.schema_src,
+                                 t_name=self.src_loan)
+        with open(self.doc_src) as file:
             documents = yaml.full_load(file)
         field_list = documents[self.src_loan]['tables'][self.src_loan]['fields']
         field_list.append(documents[self.src_loan]['tables'][self.src_loan]['hash_key'])
@@ -69,11 +61,11 @@ class Darlehen:
         return lkp[zweck.upper()]
 
     def mapping(self, data: pd.DataFrame):
-        with open(self.conf_r + self.target + '.yaml') as file:
+        with open(self.doc_trg) as file:
             documents = yaml.full_load(file)
         sat_target_fields = documents[self.target]['tables']['s_' + self.target]['fields']
         sat_res_data = pd.DataFrame(columns=sat_target_fields)
-        with open(self.conf_r + self.src_loan + '.yaml') as file:
+        with open(self.doc_trg) as file:
             _documents = yaml.full_load(file)
         print("mapping")
         sat_res_data['darlehensnummer'] = data['loan_id']
@@ -96,10 +88,10 @@ class Darlehen:
         con = connect_to_db(layer=self.schema_trg)
         loader = ILoader(date=self.date, loader_type='datavault', loading_sat='s_darlehen', loading_entity=self.target,
                          target_connection=con,
-                         schema=self.schema_trg, build_hash_key=False, load_domain=self.__class__.__name__.upper(),
-                         lclass=self.load_domain, lcli=self.cli_log, lfile=self.file_log)
+                         schema=self.schema_trg, build_hash_key=False, load_domain=self.__class__.__name__.upper())
         loader.load(data=data)
 
 
 entity = Darlehen(date='2018-12-31')
-entity.writeToDB(entity.mapping(entity.join()))
+join = entity.join()
+#entity.writeToDB(entity.mapping(entity.join()))

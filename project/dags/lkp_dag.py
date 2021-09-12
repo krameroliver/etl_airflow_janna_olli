@@ -4,13 +4,8 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.sensors.external_task import ExternalTaskSensor
-
-try:
-    from utils.build_static_lookup import static_lookup
-    from utils.build_dynamic_lookup import dynamic_lkp
-except ImportError:
-    from project.dags.utils.build_static_lookup import static_lookup
-    from project.dags.utils.build_dynamic_lookup import dynamic_lkp
+from dwhutils.build_dynamic_lookup import dynamic_lkp
+from dwhutils.build_static_lookup import static_lookup
 
 s_lkp = static_lookup()
 d_lkp = dynamic_lkp()

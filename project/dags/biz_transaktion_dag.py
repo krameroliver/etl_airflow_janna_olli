@@ -6,9 +6,6 @@ from airflow.operators.python_operator import PythonOperator
 
 from biz_beladung.transaktion import Transaktion
 
-# try:
-# except ImportError:
-#    from project.dags.biz_beladung.geschaeftspartner import Gp
 
 default_args = {
     "owner": "airflow",

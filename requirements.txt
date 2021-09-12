@@ -1,3 +1,5 @@
+dwhutils==0.1.9
+python-dotenv
 ConfigParser
 psycopg2-binary
 pandas

@@ -4,14 +4,14 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-from biz_beladung.l_cc_konto import Link_CC_Konto
+from biz_beladung.l_cc_konto import LinkCcKonto
 
 default_args = {
     "owner": "airflow",
     'start_date': datetime(2021, 6, 12)
 }
 
-link = Link_CC_Konto('2018-12-31')
+link = LinkCcKonto('2018-12-31')
 
 
 def join(**kwargs):

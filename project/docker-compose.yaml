@@ -86,6 +86,7 @@ services:
       - PGID=1000
       - MYSQL_ROOT_PASSWORD=123456
       - TZ=Europe/Berlin
+    hostname: coredb
     volumes:
       - mariadb-db-volume:/var/lib/mariadb/data
     ports:
