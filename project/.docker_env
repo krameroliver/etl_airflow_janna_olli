@@ -1,0 +1,4 @@
+DB_CONFIG='/Configs/Global/db.yaml'
+KEYPASS='/Configs/dwh.kdbx'
+ENTITY_CONFIGS='/Configs/ENB'
+DATA_PATH='/rawdata/ENB'

@@ -51,6 +51,9 @@ x-airflow-common:
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
     AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true'
+    AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT: 3000
+  env_file:
+    - .docker_env
   volumes:
     - ./dags/Configs:/Configs
     - ./dags:/opt/airflow/dags
@@ -81,12 +84,12 @@ services:
 
   CoreDB:
     image: linuxserver/mariadb
+    hostname: coredb
     environment:
       - PUID=1000
       - PGID=1000
       - MYSQL_ROOT_PASSWORD=123456
       - TZ=Europe/Berlin
-    hostname: coredb
     volumes:
       - mariadb-db-volume:/var/lib/mariadb/data
     ports:
@@ -108,6 +111,8 @@ services:
     restart: always
 
   redis:
+    env_file:
+      - .docker_env
     image: redis:latest
     ports:
       - 6379:6379
@@ -138,11 +143,17 @@ services:
     restart: always
 
   airflow-worker:
+    env_file:
+      - .docker_env
     <<: *airflow-common
     command: celery worker
     restart: always
+    hostname: worker
+
 
   airflow-init:
+    env_file:
+      - .docker_env
     <<: *airflow-common
     command: version
     environment:
@@ -153,6 +164,8 @@ services:
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
 
   flower:
+    env_file:
+      - .docker_env
     <<: *airflow-common
     command: celery flower
     ports:

@@ -6,7 +6,6 @@ from airflow.operators.python_operator import PythonOperator
 
 from biz_beladung.transaktion import Transaktion
 
-
 default_args = {
     "owner": "airflow",
     'start_date': datetime(2021, 6, 12)
@@ -29,7 +28,6 @@ def mapping(**kwargs):
 def load(**kwargs):
     ti = kwargs['ti']
     data_to_db = ti.xcom_pull(key='kreditkarte_map_data')
-    print(data_to_db)
     transaktion.writeToDB(data_to_db)
 
 

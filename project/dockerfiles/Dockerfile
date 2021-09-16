@@ -1,4 +1,5 @@
 FROM apache/airflow:2.0.2
+RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN pip install requests
 RUN pip install pandas
 RUN pip install sqlalchemy
@@ -15,4 +16,6 @@ RUN pip install sshtunnel
 RUN pip install pykeepass
 RUN pip install swifter
 RUN pip install python-dotenv
-RUN pip install dwhutils==0.1.9
+RUN pip install dwhutils==0.2.6
+CMD apt-get update
+CMD apt-get install net-tools

@@ -2,7 +2,7 @@ database:
   CoreDWH:
     port: 3306 #5432
     db_name: CoreDWH
-    host: coredb
+    host: 192.168.178.33 #172.18.0.7
     type: mariadb # postgres
     sshhost: 82.165.203.114
     useSSH: False

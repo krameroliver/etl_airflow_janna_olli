@@ -32,11 +32,11 @@ d = DAG(dag_id='load_lookups',
         catchup=False)
 
 src_dependency = ExternalTaskSensor(
-   task_id='src_dag_completed_status',
-   external_dag_id='load_all_source',
-   external_task_id='end',  # wait for whole DAG to complete
-   check_existence=True,
-   start_date=datetime(2021, 6, 12))
+    task_id='src_dag_completed_status',
+    external_dag_id='load_all_source',
+    external_task_id='end',  # wait for whole DAG to complete
+    check_existence=True,
+    start_date=datetime(2021, 6, 12))
 
 startAllTasks = BashOperator(
     task_id='start',

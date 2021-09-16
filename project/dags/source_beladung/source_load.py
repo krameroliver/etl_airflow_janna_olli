@@ -1,3 +1,4 @@
+import logging
 import warnings
 
 import pandas as pd
@@ -27,7 +28,8 @@ def read_write_source(file, date, table, delm, header):
     conf_r = os.getenv('ENTITY_CONFIGS')
     source_path = os.getenv('DATA_PATH')
 
-    p = os.path.join(conf_r, table + '.yaml').replace(r"\\\\", r"/")
+    p = os.path.join(conf_r, table + '.yaml')
+    logging.warning(p)
     with open(p) as f:
         documents = yaml.full_load(f)
     target_fields = documents[table]['tables'][table]['fields']
@@ -54,13 +56,13 @@ def read_write_source(file, date, table, delm, header):
     loader.load(data=data)
 
 
-read_write_source(file='acct.csv', date="2018-12-31", table='acct', header=0, delm=',')
-read_write_source(file='card.csv', date="2018-12-31", table='card', header=0, delm=',')
-read_write_source(file='client.csv', date="2018-12-31", table='client', header=0, delm=',')
-read_write_source(file='disposition.csv', date="2018-12-31", table='disposition', header=0, delm=',')
-read_write_source(file='district.csv', date="2018-12-31", table='district', header=0, delm=',')
-read_write_source(file='loan.csv', date="2018-12-31", table='loan', header=0, delm=',')
-read_write_source(file='order.csv', date="2018-12-31", table='order', header=0, delm=',')
-print('trans')
-read_write_source(file='trans.csv', date="2018-12-31", table='trans', header=0, delm=',')
-print('Fertig')
+# read_write_source(file='acct.csv', date="2018-12-31", table='acct', header=0, delm=',')
+# read_write_source(file='card.csv', date="2018-12-31", table='card', header=0, delm=',')
+# read_write_source(file='client.csv', date="2018-12-31", table='client', header=0, delm=',')
+# read_write_source(file='disposition.csv', date="2018-12-31", table='disposition', header=0, delm=',')
+# read_write_source(file='district.csv', date="2018-12-31", table='district', header=0, delm=',')
+# read_write_source(file='loan.csv', date="2018-12-31", table='loan', header=0, delm=',')
+# read_write_source(file='order.csv', date="2018-12-31", table='order', header=0, delm=',')
+# print('trans')
+# read_write_source(file='trans.csv', date="2018-12-31", table='trans', header=0, delm=',')
+# print('Fertig')

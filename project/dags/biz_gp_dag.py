@@ -6,10 +6,6 @@ from airflow.operators.python_operator import PythonOperator
 
 from biz_beladung.geschaeftspartner import Gp
 
-# try:
-# except ImportError:
-#    from project.dags.biz_beladung.geschaeftspartner import Gp
-
 default_args = {
     "owner": "airflow",
     'start_date': datetime(2021, 6, 12)
@@ -67,7 +63,7 @@ def load_digitale_add(**kwargs):
 
 
 def load_subdag(parent_dag_name, child_dag_name, args):
-    d = DAG(dag_id='{0}.{1}'.format(parent_dag_name,child_dag_name),
+    d = DAG(dag_id='{0}.{1}'.format(parent_dag_name, child_dag_name),
             schedule_interval="@daily",
             default_args=args,
             catchup=False)
